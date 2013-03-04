@@ -6,6 +6,8 @@ Redis 2.6.x  (stable)
 
 It is suggested to use RVM to install Ruby
 
+https://rvm.io/
+
 II.  To install and run, execute
 
 gem build cloud_crawler.gemspec
