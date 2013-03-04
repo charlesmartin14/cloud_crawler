@@ -1,0 +1,27 @@
+
+I. Dependencies
+
+Ruby 1.9.3
+Redis 2.6.x  (stable)
+
+It is suggested to use RVM to install Ruby
+
+II.  To install and run, execute
+
+gem build cloud_crawler.gemspec
+gem install cloud_crawler-0.1.gem 
+
+this should install the cloud_crawler.rb  CLI  in 
+
+/Users/charlesmartin14/.rvm/gems/ruby-1.9.3-p385/bin/cloud_crawler.rb
+
+
+III.  Start redis locally
+
+redis-server &
+
+IV.  try a crawl
+
+cloud_crawler.rb url-list  http://www.livestrong.com  > urls.out &
+
+
