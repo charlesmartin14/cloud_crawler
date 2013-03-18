@@ -1,6 +1,7 @@
 $:.unshift(File.dirname(__FILE__))
 require 'spec_helper'
 
+
 module CloudCrawler
   describe RedisPageStore do
 
@@ -11,15 +12,16 @@ module CloudCrawler
     # redis should be running locally
       before(:each) do
         @url = SPEC_DOMAIN
-        @store = RedisPageStore.new
+        @redis = Redis::Namespace.new("RedisPageStoreSpec", :redis => Redis.new)
+        @store = RedisPageStore.new(@redis)
         @page = Page.new(URI(@url))
       end
 
       after(:each) do
         @store.close
+        @redis.flushdb
       end
-      
-        
+              
       it "should normalize https in urls " do
          @store.key_for("https://www.google.com").should == "http://www.google.com"
       end

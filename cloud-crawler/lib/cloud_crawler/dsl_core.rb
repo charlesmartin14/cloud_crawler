@@ -1,5 +1,5 @@
 require 'robotex'
-require 'sourcify, > 0.6' #
+require 'sourcify' 
 require 'json'
 require 'active_support/inflector'
 require 'active_support/core_ext'

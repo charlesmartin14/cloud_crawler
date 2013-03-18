@@ -4,26 +4,28 @@ require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
 
-
+    
 module CloudCrawler
+  
+  
   class RedisPageStore
     include Enumerable
     
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
-      
-      @redis = Redis.new(:host => opts[:qless_host], :port => opts[:qless_port], :driver => :hiredis)
+      @redis = redis
       @key_prefix = opts[:key_prefix] || 'c|c'
       @pages = Redis::Namespace.new("#{@key_prefix}:pages", :redis => redis)
-      # # keys.each { |key| delete(key) }  # fushdb ?
+      # # keys.each { |key| delete(key) }  # flushdb ?
       #
       items, bits = 100_000, 5
       opts[:size] ||= items*bits
       opts[:hashes] ||= 7
+      opts[:namespace] = "#{@key_prefix}:pages_bf"
+      opts[:db] = redis
       
       # 2.5 mb? 
-      @bloomfilter  = BloomFilter::Redis.new(:host => opts[:qless_host],:port =>  opts[:qless_port], :driver => :hiredis) 
-
+      @bloomfilter = BloomFilter::Redis.new opts
     end
 
     def close
@@ -32,7 +34,7 @@ module CloudCrawler
 
 
     def key_for(url)
-      url.to_s.gsub(/https/,'http')
+      url.to_s.gsub("https",'http')
     end
     
     
@@ -55,6 +57,10 @@ module CloudCrawler
 
     def has_page?(url)
       @pages.exists(key_for url)
+    end
+    
+    def has_key?(key)
+      @pages.exists(key)
     end
 
     def each

@@ -3,8 +3,8 @@ require 'cloud_crawler/exceptions'
 require 'cloud_crawler/crawl_job'
 require 'active_support/inflector'
 require 'active_support/core_ext'
-require 'sourcify, > 0.6' #
 require 'json'
+require 'sourcify' 
 require 'qless'
 
 module CloudCrawler
