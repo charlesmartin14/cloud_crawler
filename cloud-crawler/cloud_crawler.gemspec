@@ -11,12 +11,19 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = true
   s.rdoc_options << '-m' << 'README.rdoc' << '-t' << 'CloudCrawler'
   s.extra_rdoc_files = ["README.rdoc"]
-  s.add_dependency("nokogiri", ">= 1.3.0")
-  s.add_dependency("robotex", ">= 1.0.0")
-  s.add_dependency "redis", ">=2.2.0"
+  s.add_dependency "nokogiri", ">= 1.5.6"
+  s.add_dependency "robotex", ">= 1.0.0"
+  s.add_dependency "redis", ">=3.0.3"   
   s.add_dependency "redis-namespace", ">=1.2.1"
   s.add_dependency "bloomfilter-rb", ">=2.1.1"
-  
+  s.add_dependency "hiredis", "~> 0.4.5"
+  s.add_dependency "active_support", "~> 3.0.0"
+  s.add_dependency "webrick", "~> 1.3.1"
+
+
+  s.add_dependency "qless", ">=0.9.2"  # cc version
+  s.add_dependency "sourcify", ">=0.6.0"  # cc version
+
   s.add_development_dependency "rake", ">=0.9.2"
   s.add_development_dependency "rspec", ">=2.12.0"
   s.add_development_dependency "fakeweb", ">=1.3.0"

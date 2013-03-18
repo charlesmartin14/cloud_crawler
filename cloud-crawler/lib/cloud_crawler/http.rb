@@ -19,6 +19,8 @@ module CloudCrawler
       @opts = opts
       @cookie_store = CookieStore.new(@opts[:cookies])
     end
+    
+   
 
     def size
       @connections.size

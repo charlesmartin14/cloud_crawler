@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'ostruct'
+require 'json'
 require 'webrick/cookie'
 
 module CloudCrawler
@@ -195,6 +196,7 @@ module CloudCrawler
        'fetched' => @fetched}
     end
 
+  
     def self.from_hash(hash)
       page = self.new(URI(hash['url']))
       {'@headers' =>hash['headers'],
@@ -213,5 +215,15 @@ module CloudCrawler
       end
       page
     end
+
+    def to_json
+      to_hash.to_json
+    end
+    
+    def self.from_json(json)
+      from_hash(JSON.parse(json))
+    end
+    
+   
   end
 end

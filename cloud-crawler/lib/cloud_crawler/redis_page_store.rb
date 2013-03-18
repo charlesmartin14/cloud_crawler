@@ -4,29 +4,26 @@ require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
 
-# stores urls and pages in a tmp cache
-# uses bloom filter to check for pages already found
-# expects cron / whenever job to pull data and save to s3 / disk to keep memory low
 
 module CloudCrawler
   class RedisPageStore
     include Enumerable
-
     
     MARSHAL_FIELDS = %w(links visited fetched)
-    def initialize(opts = {})
-      @redis = Redis.new(opts)
+    def initialize(redis, opts = {})
+      
+      @redis = Redis.new(:host => opts[:qless_host], :port => opts[:qless_port], :driver => :hiredis)
       @key_prefix = opts[:key_prefix] || 'c|c'
-      @pages = Redis::Namespace.new("#{@key_prefix}:pages", :redis => @redis)
+      @pages = Redis::Namespace.new("#{@key_prefix}:pages", :redis => redis)
       # # keys.each { |key| delete(key) }  # fushdb ?
       #
       items, bits = 100_000, 5
       opts[:size] ||= items*bits
       opts[:hashes] ||= 7
-      @bloomfilter  = BloomFilter::Redis.new(opts) # 2.5 mb
-    #
-    # #@queue = Redis.new(opts)
-    # #TODO:  use redis as queue for evens as well
+      
+      # 2.5 mb? 
+      @bloomfilter  = BloomFilter::Redis.new(:host => opts[:qless_host],:port =>  opts[:qless_port], :driver => :hiredis) 
+
     end
 
     def close
@@ -114,44 +111,47 @@ module CloudCrawler
     alias_method :visited_url?, :touched_url? 
 
 
-    # save snapshot of existing pages to s3
-    # delete pages when done
-    # TODO:  add thread that monitors num pages, runs and serialized
-    # TODO:try to add aws-s3 gem with creds passed on command line?  really?
-    #  first, just check that s3cmd works on current deployment
-    # TODO:  add node id in case multiple saves are occuring (how?)    
-    def serialize_pages!
-      keys = @pages.keys "*"
-      num = keys.size
-      
-      filename = "#{@key_prefix}:pages.#{Time.now.getutc}.jsons.gz"
-      Zlib::GzipWriter.open(filename) do |gz|
-         keys.each { |k| f << @pages[k] }
-      end
-      
-      md5 = Digest::MD5.file(filename).hexdigest  
-          
-      #  better to use aws-s3 library ??
-      
-      tmp_file = "tmp_pages"
-      system "s3cmd put #{filename}"
-      system "s3cmd get #{filename} #{tmp_file}"
-
-      tmp_md5 = Digest::MD5.file(tmp_file).hexdigest  
-      
-      if md5==tmp_md5 then
-        File.delete(tmp_file)
-        @pages.pipelined do
-          keys.each { |k| @pages.del k }
-        end
-      else
-        num = -1
-      end
-      
- 
-      return num
-    end
     
+# TODO:  make this a qless job, remove it from here
+    # #
+    # # save snapshot of existing pages to s3
+    # # delete pages when done
+    # # TODO:  add thread that monitors num pages, runs and serialized
+    # # TODO:try to add aws-s3 gem with creds passed on command line?  really?
+    # #  first, just check that s3cmd works on current deployment
+    # # TODO:  add node id in case multiple saves are occuring (how?)    
+    # def serialize_pages!
+      # keys = @pages.keys "*"
+      # num = keys.size
+#       
+      # filename = "#{@key_prefix}:pages.#{Time.now.getutc}.jsons.gz"
+      # Zlib::GzipWriter.open(filename) do |gz|
+         # keys.each { |k| f << @pages[k] }
+      # end
+#       
+      # md5 = Digest::MD5.file(filename).hexdigest  
+#           
+      # #  better to use aws-s3 library ??
+#       
+      # tmp_file = "tmp_pages"
+      # system "s3cmd put #{filename}"
+      # system "s3cmd get #{filename} #{tmp_file}"
+# 
+      # tmp_md5 = Digest::MD5.file(tmp_file).hexdigest  
+#       
+      # if md5==tmp_md5 then
+        # File.delete(tmp_file)
+        # @pages.pipelined do
+          # keys.each { |k| @pages.del k }
+        # end
+      # else
+        # num = -1
+      # end
+#       
+#  
+      # return num
+    # end
+#     
     
   
     private
