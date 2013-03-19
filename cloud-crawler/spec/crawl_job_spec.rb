@@ -14,8 +14,8 @@ module CloudCrawler
       @page_store = RedisPageStore.new(redis)
     end
 
-    def crawl_link(url)
-      job = TestJob.new(url)
+    def crawl_link(url, opts={})
+      job = TestJob.new(url, referer=nil, depth=nil, opts=opts)
       CrawlJob.perform(job)
       @page_store.size.should == 1
       while qjob = job.queue.pop
@@ -79,20 +79,32 @@ module CloudCrawler
       crawl_link(pages[0].url).should == 2
       @page_store.keys.should_not  include(pages[2].url)
     end
-    
-  #
-  # it "should be able to skip links with query strings" do
-  # pages = []
-  # pages << FakePage.new('0', :links => ['1?foo=1', '2'])
-  # pages << FakePage.new('1?foo=1')
-  # pages << FakePage.new('2')
-  #
-  # core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
-  # a.skip_query_strings = true
-  # end
-  #
-  # core.should have(2).pages
-  # end
+
+
+
+   it "should not discard page bodies by default" do
+  CloudCrawler.crawl(FakePage.new('0').url, @opts).pages.values#.first.doc.should_not be_nil
+  end
+  
+  it "should optionally discard page bodies to conserve memory" do
+   core = CloudCrawler.crawl(FakePage.new('0').url, @opts.merge({:discard_page_bodies => true}))
+    @page_store.values.first.doc.should be_nil
+  end
+  
+  
+ # front end dsl tests
+   # it "should be able to skip links with query strings" do
+      # pages = []
+      # pages << FakePage.new('0', :links => ['1?foo=1', '2'])
+      # pages << FakePage.new('1?foo=1')
+      # pages << FakePage.new('2')
+# 
+      # core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
+        # a.skip_query_strings = true
+      # end
+# 
+      # core.should have(2).pages
+    # end
   #
   # it "should be able to skip links based on a RegEx" do
   # pages = []
@@ -110,6 +122,10 @@ module CloudCrawler
   # core.pages.keys.should_not include(pages[3].url)
   # end
   #
+  
+  
+  
+  # TODO:  create block here and pass in
   # it "should be able to call a block on every page" do
   # pages = []
   # pages << FakePage.new('0', :links => ['1', '2'])
@@ -124,14 +140,7 @@ module CloudCrawler
   # count.should == 3
   # end
   #
-  # it "should not discard page bodies by default" do
-  # CloudCrawler.crawl(FakePage.new('0').url, @opts).pages.values#.first.doc.should_not be_nil
-  # end
-  #
-  # it "should optionally discard page bodies to conserve memory" do
-  # # core = CloudCrawler.crawl(FakePage.new('0').url, @opts.merge({:discard_page_bodies => true}))
-  # # core.pages.values.first.doc.should be_nil
-  # end
+ 
   #
   # it "should provide a focus_crawl method to select the links on each page to follow" do
   # pages = []
