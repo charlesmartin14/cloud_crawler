@@ -24,7 +24,6 @@ module CloudCrawler
       return if link == :END      
 
       http = CloudCrawler::HTTP.new(@opts)
-      puts "fetching #{link}"
       pages = http.fetch_pages(link, referer, depth)
       pages.each do |page|
          @page_store.touch_url page.url

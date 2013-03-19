@@ -85,6 +85,10 @@ module CloudCrawler
     def page_urls
 
     end
+    
+    def keys
+      @pages.keys("*")
+    end
 
     # when do we do this?  only on serialization
     def each_value
