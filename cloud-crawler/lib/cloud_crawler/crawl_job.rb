@@ -26,15 +26,16 @@ module CloudCrawler
       http = CloudCrawler::HTTP.new(@opts)
       pages = http.fetch_pages(link, referer, depth)
       pages.each do |page|
-         @page_store.touch_url page.url
-         
+         url = page.url.to_s
+         @page_store.touch_url url
+
          do_page_blocks page
          page.discard_doc! if @opts[:discard_page_bodies]
-         @page_store[page.url] = page
- 
+         @page_store[url] = page
+
          links = links_to_follow page
          links.each do |lnk|
-            data[:link], data[:referer], data[:depth] = lnk.to_s,  page.referer,  page.depth + 1
+            data[:link], data[:referer], data[:depth] = lnk.to_s,  page.referer.to_s,  page.depth + 1
             @queue.put(CrawlJob, data)
          end
         

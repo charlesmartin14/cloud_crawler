@@ -14,7 +14,7 @@ module CloudCrawler
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
       @redis = redis
-      @key_prefix = opts[:key_prefix] || 'c|c'
+      @key_prefix = opts[:key_prefix] || 'cc'
       @pages = Redis::Namespace.new("#{@key_prefix}:pages", :redis => redis)
       # # keys.each { |key| delete(key) }  # flushdb ?
       #
