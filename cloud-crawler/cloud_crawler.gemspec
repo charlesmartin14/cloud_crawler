@@ -28,6 +28,9 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency "rspec", ">=2.12.0"
   s.add_development_dependency "fakeweb", ">=1.3.0"
   s.add_development_dependency "bson_ext", ">=1.3.1"
+  s.add_development_dependency "i18n", ">=0.6.4"
+
+  
  
 
   s.files = %w[

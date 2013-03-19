@@ -1,8 +1,10 @@
 $:.unshift(File.dirname(__FILE__))
 require 'spec_helper'
 
+#TODO: actuall test this thing
+
 module CloudCrawler
-  describe Core do
+  describe CrawlJob do
 
     before(:each) do
       FakeWeb.clean_registry

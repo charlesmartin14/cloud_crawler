@@ -24,7 +24,7 @@ module CloudCrawler
         @opts = JSON.parse(data[:opts]).symbolize_keys
         @robots = Robotex.new(@opts[:user_agent]) if @opts[:obey_robots_txt]
              
-        @focus_crawl_block = JSON.parse(data[:focus_crawl_block])
+        @focus_crawl_block = JSON.parse(data[:focus_crawl_block]).first
         @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
         @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])
         @skip_link_patterns = JSON.parse(data[:skip_link_patterns])

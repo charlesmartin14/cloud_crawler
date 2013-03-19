@@ -75,7 +75,7 @@ module CloudCrawler
       
       def block_sources
         blocks = {}
-        blocks[:focus_crawl_block] = @focus_crawl_block.to_source.to_json
+        blocks[:focus_crawl_block] = [@focus_crawl_block].to_source.to_json
         blocks[:on_every_page_blocks] = @on_every_page_blocks.map(&:to_source).to_json
         blocks[:skip_link_patterns] = @skip_link_patterns.map(&:to_source).to_json
       #  blocks[:after_crawl_blocks] = @after_crawl_blocks.map(&:to_source).to_json

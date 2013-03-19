@@ -1,3 +1,13 @@
+chm 18-mar-13
+  finish core specs
+  dsl spec
+  run cloud_crawler with qless and make it work
+  
+  how test with qless? test in stand alond mode i guess
+    also, can seperately test crawl job 
+    
+    
+
   
 -. xapian = title search engine
   
