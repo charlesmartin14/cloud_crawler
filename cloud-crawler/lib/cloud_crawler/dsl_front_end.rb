@@ -5,9 +5,6 @@ require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'cloud_crawler/crawl_job'
 
-#TODO:  add relevant default ops
-# add DSL parts that make this an actual dsl  return self, etc
-# add page store creation
 
 module CloudCrawler
   

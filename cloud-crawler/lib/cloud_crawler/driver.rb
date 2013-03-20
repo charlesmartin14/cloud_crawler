@@ -42,9 +42,9 @@ module CloudCrawler
     #
     def self.crawl(urls, opts = {})
       init(opts)
-      self.new(urls, opts) do |core|
+      self.new(opts) do |core|
         yield core if block_given?
-        core.run
+        core.run(urls)
       end
     end
 
