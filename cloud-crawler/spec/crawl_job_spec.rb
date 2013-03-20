@@ -3,6 +3,8 @@ require 'spec_helper'
 require 'redis'
 require 'cloud_crawler/crawl_job'
 require 'test_job'
+require 'sourcify'
+
 
 module CloudCrawler
   describe CrawlJob do
@@ -12,11 +14,12 @@ module CloudCrawler
       @redis = Redis.new
       @redis.flushdb
       @page_store = RedisPageStore.new(@redis)
+      @cache =  Redis::Namespace.new("cc|cache", :redis => redis)
       @opts = {}
     end
 
-    def crawl_link(url, opts={})
-      job = TestJob.new(url, referer=nil, depth=nil, opts=opts)
+    def crawl_link(url, opts={}, blocks={})
+      job = TestJob.new(url, referer=nil, depth=nil, opts=opts, blocks=blocks)
       CrawlJob.perform(job)
       @page_store.size.should == 1
       while qjob = job.queue.pop
@@ -93,24 +96,23 @@ module CloudCrawler
 
   
 
-    # TODO:  create block here and pass in
-    # it "should be able to call a block on every page" do
-    # pages = []
-    # pages << FakePage.new('0', :links => ['1', '2'])
-    # pages << FakePage.new('1')
-    # pages << FakePage.new('2')
-    #
-    # count = 0
-    # CloudCrawler.crawl(pages[0].url, @opts) do |a|
-    # a.on_every_page { count += 1 }
-    # end
-    #
-    # count.should == 3
-    # end
-    #
+    it "should be able to call a block on every page" do
+      pages = []
+      pages << FakePage.new('0', :links => ['1', '2'])
+      pages << FakePage.new('1')
+      pages << FakePage.new('2')
+      
+      # problem:  how to get the state back -- it is not persisted in the run
+      # need to persist to redis or page-store
+      b = {:on_every_page_blocks => [Proc.new {   @cache.incr "count" }.to_source].to_json }
+      crawl_link(pages[0].url,opts={},blocks=b)
+      
+      @cache.get("count").should  == 3
+    end
+    
 
     #
-    # it "should provide a focus_crawl method to select the links on each page to follow" do
+    # it "should provide a focus_crawl me)thod to select the links on each page to follow" do
     # pages = []
     # pages << FakePage.new('0', :links => ['1', '2'])
     # pages << FakePage.new('1')
@@ -219,4 +221,4 @@ end
     # core.pages.keys.should_not include(pages[1].url)
     # core.pages.keys.should_not include(pages[3].url)
     # end
-    #
+    

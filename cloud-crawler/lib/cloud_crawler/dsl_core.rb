@@ -28,6 +28,7 @@ module CloudCrawler
         @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
         @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])
         @skip_link_patterns = JSON.parse(data[:skip_link_patterns])
+        
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       end
 

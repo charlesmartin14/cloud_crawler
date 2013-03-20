@@ -10,10 +10,15 @@ module CloudCrawler
     include DslCore
   
     def self.init(job)
+      @key_prefix = @opts[:key_prefix] || 'cc'
+      @cache = Redis::Namespace.new("#{@key_prefix}:cache", :redis => job.client.redis)
       @page_store = RedisPageStore.new(job.client.redis,@opts)
-      @queue = job.client.queues[@opts[:qless_qname]]
+      @queue = job.client.queues[@opts[:qless_qname]]   
     end
   
+    def self.cache
+      @cache
+    end
   
     def self.perform(job)
       super(job)
