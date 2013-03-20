@@ -39,13 +39,11 @@ module CloudCrawler
       
      
       # redis page store
-      :page_store_host => 'localhost',
+      :qless_host => 'localhost',
       # redis page store
-      :page_store_port => 1234,
-      # redis bloomfilter host
-      :bloomfilter_ip => 'localhost',
-      # redis bloomfilter port
-      :bloomfilter_port => 1234
+      :qless_port => 6379,
+      # queue name
+      :qless_qname => "crawl"
     }
 
 

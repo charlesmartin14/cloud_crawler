@@ -24,7 +24,7 @@ module CloudCrawler
      
      DRIVER_OPTS = {     
       :qless_host => 'localhost',
-      :qless_port => 1234,
+      :qless_port => 6379,
       :qless_qname => "crawl"
      }
     
@@ -33,7 +33,7 @@ module CloudCrawler
     def initialize(opts = {})
       opts.reverse_merge! DRIVER_OPTS
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port])
-      @queue = client.queues[opts[:qless_qname]]
+      @queue = @client.queues[opts[:qless_qname]]
       yield self if block_given?
     end
 
@@ -49,17 +49,16 @@ module CloudCrawler
     end
 
  
-    def run
+    def run(urls)
       load_urls(urls)
     end
     
     def load_urls(urls)
         urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
         urls.each{ |url| url.path = '/' if url.path.empty? }
-
-        urls.delete_if { |url| !visit_link?(url) }
         
-        data = block_sources
+        # TODO:  not picking this up?
+        data = self.block_sources
 
         urls.each do |url|
           data[:link] = url
