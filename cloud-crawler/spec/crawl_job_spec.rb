@@ -5,7 +5,6 @@ require 'cloud_crawler/crawl_job'
 require 'test_job'
 require 'sourcify'
 
-
 module CloudCrawler
   describe CrawlJob do
 
@@ -94,36 +93,31 @@ module CloudCrawler
       @page_store.values.first.doc.should be_nil
     end
 
-  
-
     it "should be able to call a block on every page, with access to a shared cache" do
       pages = []
       pages << FakePage.new('0', :links => ['1', '2'])
       pages << FakePage.new('1')
       pages << FakePage.new('2')
-      
+
       # problem:  how to get the state back -- it is not persisted in the run
       # need to persist to redis or page-store
       b = {:on_every_page_blocks => [Proc.new { cache.incr "count" }.to_source].to_json }
       crawl_link(pages[0].url,opts={},blocks=b)
       @cache.get("count").should == "3"
     end
-    
 
     it "should provide a focus_crawl method to select the links on each page to follow" do
-    pages = []
-    pages << FakePage.new('0', :links => ['1', '2'])
-    pages << FakePage.new('1')
-    pages << FakePage.new('2')
-    
-    b = {:focus_crawl_block => [Proc.new { page.links.reject{|l| l.to_s =~ /1/ }}.to_source].to_json }
-    crawl_link(pages[0].url,opts={},blocks=b).should == 2
-    @page_store.keys.should_not include(pages[1].url.to_s)
-    @page_store.keys.should include(pages[0].url.to_s)
-    @page_store.keys.should include(pages[2].url.to_s)
-    end
+      pages = []
+      pages << FakePage.new('0', :links => ['1', '2'])
+      pages << FakePage.new('1')
+      pages << FakePage.new('2')
 
- 
+      b = {:focus_crawl_block => [Proc.new { page.links.reject{|l| l.to_s =~ /1/ }}.to_source].to_json }
+      crawl_link(pages[0].url,opts={},blocks=b).should == 2
+      @page_store.keys.should_not include(pages[1].url.to_s)
+      @page_store.keys.should include(pages[0].url.to_s)
+      @page_store.keys.should include(pages[2].url.to_s)
+    end
 
     it "should optionally obey the robots exclusion protocol" do
       pages = []
@@ -138,7 +132,6 @@ module CloudCrawler
       urls.should include(pages[0].url)
       urls.should_not include(pages[1].url)
     end
-
 
     # CHM  this does not test refer properly...unsure why
     describe "many pages" do
@@ -160,12 +153,12 @@ module CloudCrawler
       it "should track the page depth and referer" do
         crawl_link(@pages[0].url)
         previous_page = nil
-      
+
         @pages.each_with_index do |page, i|
           page = @page_store[page.url.to_s]
           puts page.referer
         end
-        
+
       # page.depth.should == i
       # if previous_page then
       # page.referer.to_s.should == previous_page.url.to_s
@@ -188,34 +181,32 @@ module CloudCrawler
   end
 end
 
-
-  # front end dsl tests
-    # it "should be able to skip links with query strings" do
-    # pages = []
-    # pages << FakePage.new('0', :links => ['1?foo=1', '2'])
-    # pages << FakePage.new('1?foo=1')
-    # pages << FakePage.new('2')
-    #
-    # core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
-    # a.skip_query_strings = true
-    # end
-    #
-    # core.should have(2).pages
-    # end
-    #
-    # it "should be able to skip links based on a RegEx" do
-    # pages = []
-    # pages << FakePage.new('0', :links => ['1', '2'])
-    # pages << FakePage.new('1')
-    # pages << FakePage.new('2')
-    # pages << FakePage.new('3')
-    #
-    # core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
-    # a.skip_links_like /1/, /3/
-    # end
-    #
-    # core.should have(2).pages
-    # core.pages.keys.should_not include(pages[1].url)
-    # core.pages.keys.should_not include(pages[3].url)
-    # end
-    
+# front end dsl tests
+# it "should be able to skip links with query strings" do
+# pages = []
+# pages << FakePage.new('0', :links => ['1?foo=1', '2'])
+# pages << FakePage.new('1?foo=1')
+# pages << FakePage.new('2')
+#
+# core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
+# a.skip_query_strings = true
+# end
+#
+# core.should have(2).pages
+# end
+#
+# it "should be able to skip links based on a RegEx" do
+# pages = []
+# pages << FakePage.new('0', :links => ['1', '2'])
+# pages << FakePage.new('1')
+# pages << FakePage.new('2')
+# pages << FakePage.new('3')
+#
+# core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
+# a.skip_links_like /1/, /3/
+# end
+#
+# core.should have(2).pages
+# core.pages.keys.should_not include(pages[1].url)
+# core.pages.keys.should_not include(pages[3].url)
+# end

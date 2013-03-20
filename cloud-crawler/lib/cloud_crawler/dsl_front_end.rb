@@ -1,8 +1,9 @@
 require 'robotex'
-require 'sourcify, > 0.6' #
+require 'sourcify'
 require 'json'
 require 'active_support/inflector'
 require 'active_support/core_ext'
+require 'cloud_crawler/crawl_job'
 
 #TODO:  add relevant default ops
 # add DSL parts that make this an actual dsl  return self, etc
@@ -17,7 +18,7 @@ module CloudCrawler
       # don't throw away the page response body after scanning it for links
       :discard_page_bodies => false,
       # identify self as CloudCrawler/VERSION
-      :user_agent => "CloudCrawler/#{CloudCrawler::VERSION}",
+      :user_agent => "CloudCrawler",
       # no delay between requests
       :delay => 0,
       # don't obey the robots exclusion protocol
