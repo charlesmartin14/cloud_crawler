@@ -118,6 +118,19 @@ module CloudCrawler
       @page_store.keys.should include(pages[0].url.to_s)
       @page_store.keys.should include(pages[2].url.to_s)
     end
+    
+    it "should be able to skip links based on a RegEx" do
+      pages = []
+      pages << FakePage.new('0', :links => ['1', '2'])
+      pages << FakePage.new('1')    
+      pages << FakePage.new('2')
+      pages << FakePage.new('3')
+      
+      # convert pattern to source
+      b = {:skip_link_patterns => [/1/,/3/].map!{|x| x.source }.to_json }
+      crawl_link(pages[0].url,opts={},blocks=b).should == 2
+      
+    end
 
     it "should optionally obey the robots exclusion protocol" do
       pages = []

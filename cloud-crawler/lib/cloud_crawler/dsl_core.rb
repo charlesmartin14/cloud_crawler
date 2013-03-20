@@ -28,7 +28,7 @@ module CloudCrawler
         @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
         @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])
         @skip_link_patterns = JSON.parse(data[:skip_link_patterns])
-        
+        # for performance, should construct REGEXPs here, not with /#{pattern}/
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       end
 
@@ -49,7 +49,7 @@ module CloudCrawler
         end
 
         @on_pages_like_blocks.each do |pattern, blocks|
-          blocks.each { |block| instance_eval(block).call(page) } if page.url.to_s =~ pattern
+          blocks.each { |block| instance_eval(block).call(page) } if page.url.to_s =~ /#{pattern}/
         end
       end
 
@@ -113,8 +113,8 @@ module CloudCrawler
       # Returns +true+ if *link* should not be visited because
       # its URL matches a skip_link pattern.
       #
-      def skip_link?(link)
-        @skip_link_patterns.any? { |pattern| link.path =~ pattern }
+      def skip_link?(link)        
+        @skip_link_patterns.any? { |pattern| link.path =~ /#{pattern}/  }
       end
 
     end
