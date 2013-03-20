@@ -23,7 +23,7 @@ module CloudCrawler
     def self.perform(job)
       super(job)
       init(job)
-       
+             
       data = job.data.symbolize_keys
       link, referer, depth = data[:link], data[:referer], data[:depth]
       return if link == :END      

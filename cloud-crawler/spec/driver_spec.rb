@@ -1,6 +1,7 @@
 $:.unshift(File.dirname(__FILE__))
 require 'spec_helper'
 require 'cloud_crawler/driver'
+require 'cloud_crawler/redis_page_store'
 
 #TODO: implement simple DSL tests
 #  basic crawl
@@ -12,8 +13,21 @@ module CloudCrawler
 
     before(:each) do
       FakeWeb.clean_registry
+      @redis = Redis.new
+      @redis.flushdb
+      @page_store = RedisPageStore.new(@redis)
+      @cache =  Redis::Namespace.new("cc:cache", :redis => @redis)  
+      @client = Qless::Client.new
+      @queue = @client.queues[CloudCrawler::DEFAULT_OPTS[:qless_qname]] 
     end
 
+
+    def run_jobs    
+      while qjob = @queue.pop
+        qjob.perform
+      end
+    end
+    
     #   shared_examples_for "crawl" do
     it "should crawl all the html pages in a domain by following <a> href's" do
       pages = []
@@ -23,6 +37,9 @@ module CloudCrawler
       pages << FakePage.new('3')
 
       Driver.crawl(pages[0].url)
+      run_jobs
+      @page_store.size.should == 4
+      
     end
 
   end

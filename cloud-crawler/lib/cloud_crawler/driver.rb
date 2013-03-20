@@ -32,6 +32,7 @@ module CloudCrawler
   
     def initialize(opts = {})
       opts.reverse_merge! DRIVER_OPTS
+      init(opts)
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port])
       @queue = @client.queues[opts[:qless_qname]]
       yield self if block_given?
@@ -41,7 +42,6 @@ module CloudCrawler
     # Convenience method to start a new crawl
     #
     def self.crawl(urls, opts = {})
-      init(opts)
       self.new(opts) do |core|
         yield core if block_given?
         core.run(urls)
@@ -58,11 +58,11 @@ module CloudCrawler
         urls.each{ |url| url.path = '/' if url.path.empty? }
         
         # TODO:  not picking this up?
-        data = self.block_sources
+        data = block_sources
 
         urls.each do |url|
-          data[:link] = url
-          @queue.put(CrawlJob.new, data)
+          data[:link] = url.to_s
+          @queue.put(CrawlJob, data)
         end
     end
     

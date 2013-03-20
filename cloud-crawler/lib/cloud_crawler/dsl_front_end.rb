@@ -51,10 +51,11 @@ module CloudCrawler
  # does DSL can use instance methods or class instance methods ?
   module DslFrontEnd
      def self.included(base)
-      base.send :extend, ClassMethods
+       puts "extending #{base}"
+      base.send :include, InstanceMethods
     end
  
-    module ClassMethods
+    module InstanceMethods
 
       def init(opts={})
         @opts = opts.reverse_merge! DEFAULT_OPTS
@@ -71,11 +72,11 @@ module CloudCrawler
       
       def block_sources
         blocks = {}
-        blocks[:focus_crawl_block] = [@focus_crawl_block].to_source.to_json
-        blocks[:on_every_page_blocks] = @on_every_page_blocks.map(&:to_source).to_json
-        blocks[:skip_link_patterns] = @skip_link_patterns.map(&:to_source).to_json
+        blocks[:focus_crawl_block] = [@focus_crawl_block].compact.map(&:to_source).to_json
+        blocks[:on_every_page_blocks] = @on_every_page_blocks.compact.map(&:to_source).to_json
+        blocks[:skip_link_patterns] = @skip_link_patterns.compact.map(&:to_source).to_json
       #  blocks[:after_crawl_blocks] = @after_crawl_blocks.map(&:to_source).to_json
-        blocks[:on_pages_like_blocks] = @on_pages_like_blocks.each{ |_,a|  a.map!(&:to_source) }.to_json 
+        blocks[:on_pages_like_blocks] = @on_pages_like_blocks.each{ |_,a|  a.compact.map!(&:to_source) }.to_json 
         return blocks
       end
       
