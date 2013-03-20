@@ -1,69 +1,15 @@
 chm 20-mar-2013
 
-unit test driver
-create worker
-create stand alone driver => runs worker
-
-    
+1.  finish driver spec
+2.  standalone worker in driver
+3.  client workers .. run in different windows
+4.  replace CLI w/trollop
+5.  try sinatra gui on laptop
+6.  fix sinarta specs (redo?)
+7.  redis serializer as a qless job .. to s3 , fuse, whatever
+8.  start blog post
+9.  anything useful in scrapi?
+10. regression test on an actual site like ehow
     
 
   
--. xapian = title search engine
-  
-
--. deploy scraper with javascript, sinarta
-  need tracker that actually tracks like google
-  serializer / backup gem for saving redis -> s3
-   
-   
--. BLOG  compare to Writeup on Python
-  Write up on Blog
-  Deploy
-  test on EC2
-  need setup (s3 access, s3cmd and/or fog gem)
-  
-
--. set up task list in Tasktop or Asana 
-
--. ec2 
-  will need poolparty or some other management system for nodes
-  add and delete nodes onto master queue at will
-  how monitor, track, queue and dequeue
-
--. set up queue in redis to allow queing up crawls in redis
-   how set up simple queue?
-   modify core or just re-write with different class RedisQueue ?
-   might use resque later .. unclear...LATEr
-   
-   
--.a extend DSL INTERNALLY for scraping Google, Bing, Yahoo, etc
-    test performance
-    how do we place queries on the queue, then pull and processes
-    definately close to this...but not quite
-    store SERPS on S3 for now...later perhaps to RIAK or Hadoop
-    
-    
--. extend with scrapi?  or related scraping api
-    other?  how on top of nokogiri
-    extract titles, text, etc
-    
-
--. regression test on ehow.com  ... how?
-
--. add flushdb, set prefix
-
--. add redis serializer :  could be a seperate process (whenever) or part of crawler
--. add thread to serialize pages from redis -> disk and/or  S3
-  asychronus gzip and store titles/pages  
-
-
-
--. build as gem and deploy to github (private or public)
-   deploy crawler onto ec2 using gem and my repo ... HOW ?
-   have to pay for this AND beanstalk
-   for now, just build on beanstalk..later move to provate github
-   
-   how do i deploy to ec2 as is?  capitrano?
-   
-   
-
