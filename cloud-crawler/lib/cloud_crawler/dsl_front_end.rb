@@ -81,10 +81,7 @@ module CloudCrawler
         return blocks
       end
       
-      #
-      # TODO:  figure out what to do with these 
-      # Add a block to be executed on the PageStore after the crawl
-      # is finished
+      #TODO:  implement later in driver
       #
       # def after_crawl(&block)
         # @after_crawl_blocks << block
