@@ -14,7 +14,7 @@ module CloudCrawler
       @redis = Redis.new
       @redis.flushdb
       @page_store = RedisPageStore.new(@redis)
-      @cache =  Redis::Namespace.new("cc|cache", :redis => redis)
+      @cache =  Redis::Namespace.new("cc:cache", :redis => @redis)
       @opts = {}
     end
 
@@ -96,7 +96,7 @@ module CloudCrawler
 
   
 
-    it "should be able to call a block on every page" do
+    it "should be able to call a block on every page, with access to a shared cache" do
       pages = []
       pages << FakePage.new('0', :links => ['1', '2'])
       pages << FakePage.new('1')
@@ -104,27 +104,24 @@ module CloudCrawler
       
       # problem:  how to get the state back -- it is not persisted in the run
       # need to persist to redis or page-store
-      b = {:on_every_page_blocks => [Proc.new {   @cache.incr "count" }.to_source].to_json }
+      b = {:on_every_page_blocks => [Proc.new { cache.incr "count" }.to_source].to_json }
       crawl_link(pages[0].url,opts={},blocks=b)
-      
-      @cache.get("count").should  == 3
+      @cache.get("count").should == "3"
     end
     
 
-    #
-    # it "should provide a focus_crawl me)thod to select the links on each page to follow" do
-    # pages = []
-    # pages << FakePage.new('0', :links => ['1', '2'])
-    # pages << FakePage.new('1')
-    # pages << FakePage.new('2')
-    #
-    # core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
-    # a.focus_crawl {|p| p.links.reject{|l| l.to_s =~ /1/}}
-    # end
-    #
-    # core.should have(2).pages
-    # core.pages.keys.should_not include(pages[1].url)
-    # end
+    it "should provide a focus_crawl method to select the links on each page to follow" do
+    pages = []
+    pages << FakePage.new('0', :links => ['1', '2'])
+    pages << FakePage.new('1')
+    pages << FakePage.new('2')
+    
+    b = {:focus_crawl_block => [Proc.new { page.links.reject{|l| l.to_s =~ /1/ }}.to_source].to_json }
+    crawl_link(pages[0].url,opts={},blocks=b).should == 2
+    @page_store.keys.should_not include(pages[1].url.to_s)
+    @page_store.keys.should include(pages[0].url.to_s)
+    @page_store.keys.should include(pages[2].url.to_s)
+    end
 
  
 
