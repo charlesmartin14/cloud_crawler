@@ -145,24 +145,22 @@ module CloudCrawler
         data = job.data.symbolize_keys
         @opts = JSON.parse(data[:opts]).symbolize_keys
              
-        @focus_crawl_block = JSON.parse(data[:focus_crawl_block])
+        @focus_crawl_block = JSON.parse(data[:focus_crawl_block]).first
         @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
         @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])
         @skip_link_patterns = JSON.parse(data[:skip_link_patterns])
-        @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
-      
-        perform_actual(job)
+       # @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])      
       end
       
 
      
     
-      #
-      # Execute the after_crawl blocks
-      #
-      def do_after_crawl_blocks
-        @after_crawl_blocks.each { |block| instance_eval(block).call(@page_store) }
-      end
+      # #
+      # # Execute the after_crawl blocks
+      # #
+      # def do_after_crawl_blocks
+        # @after_crawl_blocks.each { |block| instance_eval(block).call(@page_store) }
+      # end
 
       #
       # Execute the on_every_page blocks for *page*

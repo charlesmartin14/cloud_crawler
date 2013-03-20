@@ -62,6 +62,7 @@ module CloudCrawler
 
         urls.each do |url|
           data[:link] = url.to_s
+          data[:opts] = @opts.to_json
           @queue.put(CrawlJob, data)
         end
     end
