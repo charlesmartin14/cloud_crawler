@@ -5,11 +5,39 @@ chm 20-mar-2013
 3.  client workers .. run in different windows
 4.  replace CLI w/trollop
 5.  try sinatra gui on laptop
-6.  fix sinarta specs (redo?)
+6.  fix sinarta specs (redo?) in qless
 7.  redis serializer as a qless job .. to s3 , fuse, whatever
 8.  start blog post
-9.  anything useful in scrapi?
-10. regression test on an actual site like ehow
+9.  anything useful in scrapi?  and cobweb
+10.  test on an actual site like ehow, livestrong, etc
+11. integrate log4r ... make sure loging works properly
+where do clients and workers log?
+
+12.  get sebastian's chef scripts working, and test this on the cloud
+make sure sinatra spools up, we have multiple nodes
+
+13.  can we monitor and reset ip addresses?
+     can crawler monitor when it fails?
+     
+14.  real DSLs to test
+running counter
+title extractor
+
+scrapi-like api for pulling related links
+not yet...but kight be able to resurrect
+
+other:
+
+click tracker
+hdfs interface / redis serializer
+liblinear
+nmf 
+
+new bloom filter...high performance, based on cityhash and tuning
+
+dsl building tools:  basic blog talk on DSLs of various forms
+
+
     
 
   

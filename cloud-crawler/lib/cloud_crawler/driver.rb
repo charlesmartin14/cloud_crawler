@@ -59,7 +59,6 @@ module CloudCrawler
         
         # TODO:  not picking this up?
         data = block_sources
-
         urls.each do |url|
           data[:link] = url.to_s
           data[:opts] = @opts.to_json

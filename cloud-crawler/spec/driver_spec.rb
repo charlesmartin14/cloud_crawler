@@ -48,16 +48,14 @@ module CloudCrawler
 
       count = 0
       Driver.crawl(pages[0].url) do |a|
-        a.on_every_page { cache["count"].incr  }
+        a.on_every_page { cache.incr "count" }
       end
-
-      @cache["count"].should == 3
+   
+      run_jobs
+      @cache["count"].should == "3"
     end
-
-  end
-end
-
-#
+    
+    #
 # it "should provide a focus_crawl method to select the links on each page to follow" do
 # pages = []
 # pages << FakePage.new('0', :links => ['1', '2'])
@@ -71,6 +69,11 @@ end
 # core.should have(2).pages
 # core.pages.keys.should_not include(pages[1].url)
 # end
+
+  end
+end
+
+
 ##
 # describe "options" do
 # it "should accept options for the crawl" do
@@ -95,7 +98,6 @@ end
 # it "should accept options via setter methods in the crawl block" do
 # core = CloudCrawler.crawl(SPEC_DOMAIN) do |a|
 # a.verbose = false
-# a.threads = 2
 # a.discard_page_bodies = true
 # a.user_agent = 'test'
 # a.obey_robots_txt = true
@@ -103,7 +105,6 @@ end
 # end
 #
 # core.opts[:verbose].should == false
-# core.opts[:threads].should == 2
 # core.opts[:discard_page_bodies].should == true
 # core.opts[:delay].should == 0
 # core.opts[:user_agent].should == 'test'
