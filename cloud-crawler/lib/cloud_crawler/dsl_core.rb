@@ -1,5 +1,5 @@
 require 'robotex'
-require 'sourcify' 
+require 'sourcify'
 require 'json'
 require 'active_support/inflector'
 require 'active_support/core_ext'
@@ -9,26 +9,31 @@ require 'active_support/core_ext'
 # add page store creation
 
 module CloudCrawler
-  
+
   module DslCore
-      
     def self.included(base)
       base.send :extend, ClassMethods
+     # base.send :extend, InstanceMethods
     end
-   
+
+   # module InstanceMethods
+
+    
+
+    # end
+
     module ClassMethods
-      
       # Qless hook
       def perform(job)
         data = job.data.symbolize_keys
         @opts = JSON.parse(data[:opts]).symbolize_keys
         @robots = Robotex.new(@opts[:user_agent]) if @opts[:obey_robots_txt]
-             
+
         @focus_crawl_block = JSON.parse(data[:focus_crawl_block]).first
         @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
         @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])
         @skip_link_patterns = JSON.parse(data[:skip_link_patterns])
-        # for performance, should construct REGEXPs here, not with /#{pattern}/
+      # for performance, should construct REGEXPs here, not with /#{pattern}/
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       end
 
@@ -87,7 +92,7 @@ module CloudCrawler
         @opts[:obey_robots_txt] ? @robots.allowed?(link) : true
       rescue
         false
-      end
+        end
 
       #
       # Returns +true+ if we are over the page depth limit.
@@ -113,7 +118,7 @@ module CloudCrawler
       # Returns +true+ if *link* should not be visited because
       # its URL matches a skip_link pattern.
       #
-      def skip_link?(link)        
+      def skip_link?(link)
         @skip_link_patterns.any? { |pattern| link.path =~ /#{pattern}/  }
       end
 

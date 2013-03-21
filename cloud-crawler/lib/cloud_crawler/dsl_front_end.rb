@@ -5,57 +5,58 @@ require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'cloud_crawler/crawl_job'
 
-
 module CloudCrawler
-  
-  
-     DEFAULT_OPTS = {
-      # disable verbose output
-      :verbose => false,
-      # don't throw away the page response body after scanning it for links
-      :discard_page_bodies => false,
-      # identify self as CloudCrawler/VERSION
-      :user_agent => "CloudCrawler",
-      # no delay between requests
-      :delay => 0,
-      # don't obey the robots exclusion protocol
-      :obey_robots_txt => false,
-      # by default, don't limit the depth of the crawl
-      :depth_limit => false,
-      # number of times HTTP redirects will be followed
-      :redirect_limit => 5,
-      # Hash of cookie name => value to send with HTTP requests
-      :cookies => nil,
-      # accept cookies from the server and send them back?
-      :accept_cookies => false,
-      # skip any link with a query string? e.g. http://foo.com/?u=user
-      :skip_query_strings => false,
-      # proxy server hostname 
-      :proxy_host => nil,
-      # proxy server port number
-      :proxy_port => false,
-      # HTTP read timeout in seconds
-      :read_timeout => nil,
-      
-     
-      # redis page store
-      :qless_host => 'localhost',
-      # redis page store
-      :qless_port => 6379,
-      # queue name
-      :qless_qname => "crawl"
-    }
 
+  DEFAULT_OPTS = {
+    # disable verbose output
+    :verbose => false,
+    # don't throw away the page response body after scanning it for links
+    :discard_page_bodies => false,
+    # identify self as CloudCrawler/VERSION
+    :user_agent => "CloudCrawler",
+    # no delay between requests
+    :delay => 0,
+    # don't obey the robots exclusion protocol
+    :obey_robots_txt => false,
+    # by default, don't limit the depth of the crawl
+    :depth_limit => false,
+    # number of times HTTP redirects will be followed
+    :redirect_limit => 5,
+    # Hash of cookie name => value to send with HTTP requests
+    :cookies => nil,
+    # accept cookies from the server and send them back?
+    :accept_cookies => false,
+    # skip any link with a query string? e.g. http://foo.com/?u=user
+    :skip_query_strings => false,
+    # proxy server hostname
+    :proxy_host => nil,
+    # proxy server port number
+    :proxy_port => false,
+    # HTTP read timeout in seconds
+    :read_timeout => nil,
 
+    # redis page store
+    :qless_host => 'localhost',
+    # redis page store
+    :qless_port => 6379,
+    # queue name
+    :qless_qname => "crawl"
+  }
 
- # does DSL can use instance methods or class instance methods ?
+  # does DSL can use instance methods or class instance methods ?
   module DslFrontEnd
-     def self.included(base)
-       puts "extending #{base}"
+    def self.included(base)
+      puts "extending #{base}"
       base.send :include, InstanceMethods
     end
- 
+
     module InstanceMethods
+
+      DEFAULT_OPTS.keys.each do |key|
+        define_method "#{key}=" do |value|
+          @opts[key.to_sym] = value
+        end
+      end
 
       def init(opts={})
         @opts = opts.reverse_merge! DEFAULT_OPTS
@@ -63,27 +64,30 @@ module CloudCrawler
         @focus_crawl_block = nil
         @on_every_page_blocks = []
         @skip_link_patterns = []
-      #  @after_crawl_blocks = []
+        #  @after_crawl_blocks = []
         @on_pages_like_blocks = Hash.new { |hash,key| hash[key] = [] }
+
         yield self if block_given?
       end
       
-      
-      
+      def opts
+        @opts
+      end
+
       def block_sources
         blocks = {}
         blocks[:focus_crawl_block] = [@focus_crawl_block].compact.map(&:to_source).to_json
         blocks[:on_every_page_blocks] = @on_every_page_blocks.compact.map(&:to_source).to_json
         blocks[:skip_link_patterns] = @skip_link_patterns.compact.to_json
-        blocks[:on_pages_like_blocks] = @on_pages_like_blocks.each{ |_,a|  a.compact.map!(&:to_source) }.to_json 
+        blocks[:on_pages_like_blocks] = @on_pages_like_blocks.each{ |_,a|  a.compact.map!(&:to_source) }.to_json
         return blocks
       end
-      
+
       #TODO:  implement later in driver
       #
       # def after_crawl(&block)
-        # @after_crawl_blocks << block
-        # self
+      # @after_crawl_blocks << block
+      # self
       # end
 
       #
@@ -126,9 +130,7 @@ module CloudCrawler
         self
       end
 
-
     end
   end
-  
- 
+
 end

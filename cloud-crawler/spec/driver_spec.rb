@@ -61,58 +61,56 @@ module CloudCrawler
       pages << FakePage.new('1')
       pages << FakePage.new('2')
 
-       Driver.crawl(pages[0].url) do |a|
-        a.focus_crawl do |p| 
-          p.links.reject do |l| 
+      # note:  sourcify gets confused with multiple procs on the same line
+      Driver.crawl(pages[0].url) do |a|
+        a.focus_crawl do |p|
+          p.links.reject do |l|
             l.to_s =~ /1/ end
         end
       end
-      
+
       run_jobs
       @page_store.size.should == 2
       @page_store.keys.should include(pages[0].url.to_s)
       @page_store.keys.should_not include(pages[1].url.to_s)
     end
 
+    describe "options" do
+      it "should accept options for the crawl" do
+        core = Driver.crawl(SPEC_DOMAIN,
+        :verbose => false,
+        :discard_page_bodies => true,
+        :user_agent => 'test',
+        :delay => 8,  # not implemented yet
+        :obey_robots_txt => true,
+        :depth_limit => 3)
+
+        core.opts[:verbose].should == false
+        core.opts[:discard_page_bodies].should == true
+        core.opts[:user_agent].should == 'test'
+        core.opts[:delay].should == 8
+        core.opts[:obey_robots_txt].should == true
+        core.opts[:depth_limit].should == 3
+      end
+    end
+
+    it "should accept options via setter methods in the crawl block" do
+      core = Driver.crawl(SPEC_DOMAIN) do |a|
+        a.verbose = false
+        a.discard_page_bodies = true
+        a.user_agent = 'test'
+        a.delay = 8
+        a.obey_robots_txt = true
+        a.depth_limit = 3
+      end
+
+      core.opts[:verbose].should == false
+      core.opts[:discard_page_bodies].should == true
+      core.opts[:delay].should == 8
+      core.opts[:user_agent].should == 'test'
+      core.opts[:obey_robots_txt].should == true
+      core.opts[:depth_limit].should == 3
+    end
+
   end
 end
-
-##
-# describe "options" do
-# it "should accept options for the crawl" do
-# core = CloudCrawler.crawl(SPEC_DOMAIN, :verbose => false,
-# :threads => 2,
-# :discard_page_bodies => true,
-# :user_agent => 'test',
-# :obey_robots_txt => true,
-# :depth_limit => 3)
-#
-# core.opts[:verbose].should == false
-# core.opts[:threads].should == 2
-# core.opts[:discard_page_bodies].should == true
-# core.opts[:delay].should == 0
-# core.opts[:user_agent].should == 'test'
-# core.opts[:obey_robots_txt].should == true
-# core.opts[:depth_limit].should == 3
-# end
-#
-
-# TODO:  re-implement this
-# it "should accept options via setter methods in the crawl block" do
-# core = CloudCrawler.crawl(SPEC_DOMAIN) do |a|
-# a.verbose = false
-# a.discard_page_bodies = true
-# a.user_agent = 'test'
-# a.obey_robots_txt = true
-# a.depth_limit = 3
-# end
-#
-# core.opts[:verbose].should == false
-# core.opts[:discard_page_bodies].should == true
-# core.opts[:delay].should == 0
-# core.opts[:user_agent].should == 'test'
-# core.opts[:obey_robots_txt].should == true
-# core.opts[:depth_limit].should == 3
-# end
-#
-
