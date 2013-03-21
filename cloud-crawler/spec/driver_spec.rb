@@ -50,29 +50,32 @@ module CloudCrawler
       Driver.crawl(pages[0].url) do |a|
         a.on_every_page { cache.incr "count" }
       end
-   
+
       run_jobs
       @cache["count"].should == "3"
     end
-    
-    #
-# it "should provide a focus_crawl method to select the links on each page to follow" do
-# pages = []
-# pages << FakePage.new('0', :links => ['1', '2'])
-# pages << FakePage.new('1')
-# pages << FakePage.new('2')
-#
-# core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
-# a.focus_crawl {|p| p.links.reject{|l| l.to_s =~ /1/}}
-# end
-#
-# core.should have(2).pages
-# core.pages.keys.should_not include(pages[1].url)
-# end
+
+    it "should provide a focus_crawl method to select the links on each page to follow" do
+      pages = []
+      pages << FakePage.new('0', :links => ['1', '2'])
+      pages << FakePage.new('1')
+      pages << FakePage.new('2')
+
+       Driver.crawl(pages[0].url) do |a|
+        a.focus_crawl do |p| 
+          p.links.reject do |l| 
+            l.to_s =~ /1/ end
+        end
+      end
+      
+      run_jobs
+      @page_store.size.should == 2
+      @page_store.keys.should include(pages[0].url.to_s)
+      @page_store.keys.should_not include(pages[1].url.to_s)
+    end
 
   end
 end
-
 
 ##
 # describe "options" do
