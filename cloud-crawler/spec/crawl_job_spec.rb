@@ -207,19 +207,3 @@ end
 #
 # core.should have(2).pages
 # end
-#
-# it "should be able to skip links based on a RegEx" do
-# pages = []
-# pages << FakePage.new('0', :links => ['1', '2'])
-# pages << FakePage.new('1')
-# pages << FakePage.new('2')
-# pages << FakePage.new('3')
-#
-# core = CloudCrawler.crawl(pages[0].url, @opts) do |a|
-# a.skip_links_like /1/, /3/
-# end
-#
-# core.should have(2).pages
-# core.pages.keys.should_not include(pages[1].url)
-# core.pages.keys.should_not include(pages[3].url)
-# end

@@ -16,18 +16,17 @@ module CloudCrawler
       @redis = Redis.new
       @redis.flushdb
       @page_store = RedisPageStore.new(@redis)
-      @cache =  Redis::Namespace.new("cc:cache", :redis => @redis)  
+      @cache =  Redis::Namespace.new("cc:cache", :redis => @redis)
       @client = Qless::Client.new
-      @queue = @client.queues[CloudCrawler::DEFAULT_OPTS[:qless_qname]] 
+      @queue = @client.queues[CloudCrawler::DEFAULT_OPTS[:qless_qname]]
     end
 
-
-    def run_jobs    
+    def run_jobs
       while qjob = @queue.pop
         qjob.perform
       end
     end
-    
+
     #   shared_examples_for "crawl" do
     it "should crawl all the html pages in a domain by following <a> href's" do
       pages = []
@@ -38,27 +37,25 @@ module CloudCrawler
 
       Driver.crawl(pages[0].url)
       run_jobs
-      @page_store.size.should == 4  
+      @page_store.size.should == 4
+    end
+
+    it "should be able to call a block on every page" do
+      pages = []
+      pages << FakePage.new('0', :links => ['1', '2'])
+      pages << FakePage.new('1')
+      pages << FakePage.new('2')
+
+      count = 0
+      Driver.crawl(pages[0].url) do |a|
+        a.on_every_page { cache["count"].incr  }
+      end
+
+      @cache["count"].should == 3
     end
 
   end
 end
-
-# it "should be able to call a block on every page" do
-# pages = []
-# pages << FakePage.new('0', :links => ['1', '2'])
-# pages << FakePage.new('1')
-# pages << FakePage.new('2')
-#
-# count = 0
-# CloudCrawler.crawl(pages[0].url, @opts) do |a|
-# a.on_every_page { count += 1 }
-# end
-#
-# count.should == 3
-# end
-#
-
 
 #
 # it "should provide a focus_crawl method to select the links on each page to follow" do
