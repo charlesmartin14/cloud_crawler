@@ -51,6 +51,7 @@ module CloudCrawler
 
     module InstanceMethods
 
+      # where are the getters?
       DEFAULT_OPTS.keys.each do |key|
         define_method "#{key}=" do |value|
           @opts[key.to_sym] = value
