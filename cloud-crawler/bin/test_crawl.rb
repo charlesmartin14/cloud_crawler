@@ -10,8 +10,10 @@ opts = Trollop::options do
 end
 
 
-CloudCrawler::crawl_now(opts[:urls])  do |c|
+CloudCrawler::standalone_crawl(opts[:urls])  do |c|
   puts "i am being exec locally"
   c.on_every_page {   puts cache.incr "count" } 
 end
+
+
 

@@ -33,14 +33,7 @@ module CloudCrawler
     # proxy server port number
     :proxy_port => false,
     # HTTP read timeout in seconds
-    :read_timeout => nil,
-
-    # redis page store
-    :qless_host => 'localhost',
-    # redis page store
-    :qless_port => 6379,
-    # queue name
-    :qless_qname => "crawl"
+    :read_timeout => nil
   }
 
   # does DSL can use instance methods or class instance methods ?

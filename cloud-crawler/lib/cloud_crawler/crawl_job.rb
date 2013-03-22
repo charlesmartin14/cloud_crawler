@@ -13,7 +13,7 @@ module CloudCrawler
       @key_prefix = @opts[:key_prefix] || 'cc'
       @cache = Redis::Namespace.new("#{@key_prefix}:cache", :redis => job.client.redis)
       @page_store = RedisPageStore.new(job.client.redis,@opts)
-      @queue = job.client.queues[@opts[:qless_qname]]   
+      @queue = job.client.queues[@opts[:qless_queues].first]   
     end
   
     def self.cache

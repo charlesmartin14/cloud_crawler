@@ -1,7 +1,7 @@
 require 'cloud_crawler/dsl_front_end'
 require 'cloud_crawler/exceptions'
 require 'cloud_crawler/crawl_job'
-require 'cloud_crawler/worker'
+require 'cloud_crawler/test_worker'
 
 require 'active_support/inflector'
 require 'active_support/core_ext'
@@ -18,17 +18,17 @@ module CloudCrawler
   # Convenience method to start a crawl 
   #   block not used yet
   #
-  def CloudCrawler.crawl(urls, options = {}, &block)
-    Driver.crawl(urls, options, &block)
+  def CloudCrawler.crawl(urls, opts = {}, &block)
+    Driver.crawl(urls, opts, &block)
   end
   
   
   #
   # Convenience method to start a crawl in stand alone mode
   #
-  def CloudCrawler.crawl_now(urls, options = {}, &block)
-    crawl(urls, options, &block)
-    Worker.run(options)  # no block passed, not used yet
+  def CloudCrawler.standalone_crawl(urls, opts = {}, &block)
+    crawl(urls, opts, &block)
+    Worker.run(opts)
   end
   
   
@@ -37,10 +37,14 @@ module CloudCrawler
    class Driver
      include DslFrontEnd
      
-     DRIVER_OPTS = {     
+     DRIVER_OPTS = {              
       :qless_host => 'localhost',
       :qless_port => 6379,
-      :qless_qname => "crawl"
+      :qless_db => 0,  # not used yet..not sure how
+      :qless_queues => ["crawl"],
+      :verbose => true,
+      :interval => 10,
+      :job_reserver => 'Ordered'
      }
     
     
@@ -48,8 +52,8 @@ module CloudCrawler
     def initialize(opts = {}, &block)
       opts.reverse_merge! DRIVER_OPTS
       init(opts)
-      @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port])
-      @queue = @client.queues[opts[:qless_qname]]
+      @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port], )
+      @queue = @client.queues[opts[:qless_queues].first]
       yield self if block_given?
     end
 
@@ -84,3 +88,19 @@ module CloudCrawler
    end
 
 end
+
+
+
+if __FILE__==$0 then
+  opts = Trollop::options do
+   opt :qless_host,  :short => "-f", :default => DRIVER_OPTS[:qless_host]
+   opt :qless_port, :short => "-p", :default => DRIVER_OPTS[:qless_port]
+   opt :qless_db, :short => "-d", :default => DRIVER_OPTS[:qless_db]
+   opt :qless_queues, :short => "-q", :default => DRIVER_OPTS[:qless_queues], :multi => true
+   opt :interval, :short => "-i", :default => DRIVER_OPTS[:interval]
+   opt :verbose, :short => "-v", :default => DRIVER_OPTS[:verbose]
+  end
+ Driver.crawl(opts)
+end
+
+

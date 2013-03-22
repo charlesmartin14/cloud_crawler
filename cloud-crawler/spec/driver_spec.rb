@@ -18,7 +18,7 @@ module CloudCrawler
       @page_store = RedisPageStore.new(@redis)
       @cache =  Redis::Namespace.new("cc:cache", :redis => @redis)
       @client = Qless::Client.new
-      @queue = @client.queues[CloudCrawler::DEFAULT_OPTS[:qless_qname]]
+      @queue = @client.queues[CloudCrawler::DEFAULT_OPTS[:qless_queues].first]
     end
 
     def run_jobs
