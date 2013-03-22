@@ -24,7 +24,7 @@ module CloudCrawler
     
      # Convenience method to start a new crawl
     #
-    def self.run(opts= {})
+    def self.run(opts={}, &block)
       self.new(opts) do |core|
         yield core if block_given?
         core.run
