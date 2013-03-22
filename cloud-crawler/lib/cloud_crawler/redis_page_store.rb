@@ -25,7 +25,7 @@ module CloudCrawler
       opts[:db] = redis
       
       # 2.5 mb? 
-      @bloomfilter = BloomFilter::Redis.new opts
+      @bloomfilter = BloomFilter::Redis.new(opts)
     end
 
     def close
