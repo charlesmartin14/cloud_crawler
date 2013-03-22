@@ -1,8 +1,11 @@
 require 'cloud_crawler/dsl_front_end'
 require 'cloud_crawler/exceptions'
 require 'cloud_crawler/crawl_job'
+require 'cloud_crawler/worker'
+
 require 'active_support/inflector'
 require 'active_support/core_ext'
+
 require 'json'
 require 'sourcify' 
 require 'qless'
@@ -12,11 +15,23 @@ module CloudCrawler
   VERSION = '0.1';
 
   #
-  # Convenience method to start a crawl in stand alone mode
+  # Convenience method to start a crawl 
+  #   block not used yet
   #
   def CloudCrawler.crawl(urls, options = {}, &block)
     Driver.crawl(urls, options, &block)
   end
+  
+  
+  #
+  # Convenience method to start a crawl in stand alone mode
+  #
+  def CloudCrawler.crawl_now(urls, options = {}, &block)
+    crawl(urls, options, &block)
+    Worker.run(opts)  # no block passed, not used yet
+  end
+  
+  
 
    # do I need to make a class ?
    class Driver

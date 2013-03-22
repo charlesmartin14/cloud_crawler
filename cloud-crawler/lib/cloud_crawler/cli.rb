@@ -1,6 +1,6 @@
 module CloudCrawler
   module CLI
-    COMMANDS = %w[count pagedepth serialize url-list]
+    COMMANDS = %w[test count pagedepth serialize url-list]
     
     def self.run
       command = ARGV.shift

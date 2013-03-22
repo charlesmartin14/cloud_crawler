@@ -19,7 +19,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency "hiredis", "~> 0.4.5"
   s.add_dependency "active_support", "~> 3.0.0"
   s.add_dependency "webrick", "~> 1.3.1"
-
+  s.add_dependency "trollop"
 
   s.add_dependency "qless", ">=0.9.2"  # cc version
   s.add_dependency "sourcify", ">=0.6.0.rc3"  # cc version

@@ -1,4 +1,3 @@
-
 require 'rubygems'
 require 'cloud_crawler'
 require 'cloud_crawler/cookie_store'

@@ -8,7 +8,7 @@ describe CloudCrawler do
     CloudCrawler.const_defined?('VERSION').should == true
   end
 
-  it "should return a CloudCrawler::Core from the crawl, which has a PageStore" do
+  it "should return a CloudCrawler::Driver from the crawl" do
     result = CloudCrawler.crawl(SPEC_DOMAIN)
     result.should be_an_instance_of(CloudCrawler::Driver)
   end
