@@ -46,7 +46,6 @@ module CloudCrawler
   # does DSL can use instance methods or class instance methods ?
   module DslFrontEnd
     def self.included(base)
-      puts "extending #{base}"
       base.send :include, InstanceMethods
     end
 
@@ -58,7 +57,7 @@ module CloudCrawler
         end
       end
 
-      def init(opts={})
+      def init(opts={}, &block)
         @opts = opts.reverse_merge! DEFAULT_OPTS
 
         @focus_crawl_block = nil

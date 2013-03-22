@@ -16,7 +16,7 @@ module CloudCrawler
      
     def initialize(opts = {}, &block)
       opts.reverse_merge! WORKER_OPTS
-      @opts=opts
+      @opts = opts
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port])
       @queue = @client.queues[opts[:qless_qname]]
       yield self if block_given?

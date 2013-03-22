@@ -45,7 +45,7 @@ module CloudCrawler
     
     
   
-    def initialize(opts = {})
+    def initialize(opts = {}, &block)
       opts.reverse_merge! DRIVER_OPTS
       init(opts)
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port])
@@ -56,7 +56,7 @@ module CloudCrawler
     #
     # Convenience method to start a new crawl
     #
-    def self.crawl(urls, opts = {})
+    def self.crawl(urls, opts = {}, &block)
       self.new(opts) do |core|
         yield core if block_given?
         core.run(urls)
@@ -72,11 +72,10 @@ module CloudCrawler
         urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
         urls.each{ |url| url.path = '/' if url.path.empty? }
         
-        # TODO:  not picking this up?
         data = block_sources
+        data[:opts] = @opts.to_json
         urls.each do |url|
           data[:link] = url.to_s
-          data[:opts] = @opts.to_json
           @queue.put(CrawlJob, data)
         end
     end

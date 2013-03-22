@@ -32,13 +32,13 @@ module CloudCrawler
       pages = http.fetch_pages(link, referer, depth)
       pages.each do |page|
          url = page.url.to_s
-         @page_store.touch_url url
+         @page_store.touch_url(url)
 
-         do_page_blocks page
+         do_page_blocks(page)
          page.discard_doc! if @opts[:discard_page_bodies]
          @page_store[url] = page
 
-         links = links_to_follow page
+         links = links_to_follow(page)
          links.each do |lnk|
             data[:link], data[:referer], data[:depth] = lnk.to_s,  page.referer.to_s,  page.depth + 1
             @queue.put(CrawlJob, data)

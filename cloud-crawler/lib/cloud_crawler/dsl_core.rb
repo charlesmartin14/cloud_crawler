@@ -32,7 +32,7 @@ module CloudCrawler
         @focus_crawl_block = JSON.parse(data[:focus_crawl_block]).first
         @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
         @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])
-        @skip_link_patterns = JSON.parse(data[:skip_link_patterns])
+        @skip_link_patterns = JSON.parse(data[:skip_link_patterns])        
       # for performance, should construct REGEXPs here, not with /#{pattern}/
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       end
