@@ -10,4 +10,4 @@ opts = Trollop::options do
 end
 
 
-CloudCrawler::crawl_now(opts[:urls])
+CloudCrawler::crawl_now(opts[:urls]) 

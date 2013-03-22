@@ -28,7 +28,7 @@ module CloudCrawler
   #
   def CloudCrawler.crawl_now(urls, options = {}, &block)
     crawl(urls, options, &block)
-    Worker.run(opts)  # no block passed, not used yet
+    Worker.run(options)  # no block passed, not used yet
   end
   
   

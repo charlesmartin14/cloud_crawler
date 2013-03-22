@@ -1,7 +1,7 @@
 require 'cloud_crawler'
 
 begin
-  # make sure that the first option is a URL we can crawl
+# make sure that the first option is a URL we can crawl
   url = URI(ARGV[0])
 rescue
   puts <<-INFO
@@ -15,4 +15,6 @@ INFO
   exit(0)
 end
 
-CloudCrawler.crawl_now(url) 
+CloudCrawler.crawl_now(url) do |a|
+  a.on_every_page { puts page }
+end
