@@ -12,9 +12,9 @@ module CloudCrawler
   class Worker
     
      WORKER_OPTS = {     
-      :qless_host => 'localhost',
+      :qless_host => '127.0.0.1',
       :qless_port => 6379,
-      :qless_db => 0,  # not used yet .. not sure how,
+      :qless_db => 0, 
       :qless_queues => "crawl",
       :verbose => true,
       :interval => 10,
@@ -26,11 +26,13 @@ module CloudCrawler
    
     def self.run(opts={})
         
-      ENV['REDIS_URL']= [opts[:qless_host],opts[:qless_port],opts[:qless_db]].join(":")
+      ENV['REDIS_URL']= "redis://#{opts[:qless_host]}:#{opts[:qless_port]}/#{opts[:qless_db]}"
       ENV['QUEUES'] = opts[:qless_queues].first
       ENV['JOB_RESERVER'] = opts[:job_reserver]
-      ENV['INTERVAL'] = opts[:interval]
-      ENV['VERBOSE'] = opts[:verbose]
+      ENV['INTERVAL'] = opts[:interval].to_s
+      ENV['VERBOSE'] = opts[:verbose].to_s
+      
+      puts ENV['REDIS_URL']
       
       Qless::Worker::start
     end
