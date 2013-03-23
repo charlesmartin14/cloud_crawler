@@ -31,9 +31,7 @@ module CloudCrawler
       ENV['JOB_RESERVER'] = opts[:job_reserver]
       ENV['INTERVAL'] = opts[:interval].to_s
       ENV['VERBOSE'] = opts[:verbose].to_s
-      
-      puts ENV['REDIS_URL']
-      
+            
       Qless::Worker::start
     end
 
