@@ -4,6 +4,9 @@ chm 20-mar-2013
 2.  standalone worker in driver
 3.  client workers .. run in different windows
 4.  replace CLI w/trollop
+
+replace al of this with Qless workers,rake task, and set dsls
+
 5.  try sinatra gui on laptop
 6.  fix sinarta specs (redo?) in qless
 7.  redis serializer as a qless job .. to s3 , fuse, whatever

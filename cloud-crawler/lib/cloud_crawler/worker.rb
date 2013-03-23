@@ -2,7 +2,8 @@ require 'qless'
 require 'qless/worker'
 require 'active_support/core_ext'
 
-#TODO:  if this useful, create a mixin or class that makes this easier does this
+#TODO: this is ridiculous
+#  if this useful, create a mixin or class that makes this easier does this
 #  set command line opts, default opts, and ENV vars all as same input options
 
 module CloudCrawler
@@ -14,7 +15,7 @@ module CloudCrawler
       :qless_host => 'localhost',
       :qless_port => 6379,
       :qless_db => 0,  # not used yet .. not sure how,
-      :qless_queues => ["crawl"],
+      :qless_queues => "crawl",
       :verbose => true,
       :interval => 10,
       :job_reserver => 'Ordered'
@@ -26,7 +27,7 @@ module CloudCrawler
     def self.run(opts={})
         
       ENV['REDIS_URL']= [opts[:qless_host],opts[:qless_port],opts[:qless_db]].join(":")
-      ENV['QUEUES'] = opts[:qless_queues]
+      ENV['QUEUES'] = opts[:qless_queues].first
       ENV['JOB_RESERVER'] = opts[:job_reserver]
       ENV['INTERVAL'] = opts[:interval]
       ENV['VERBOSE'] = opts[:verbose]

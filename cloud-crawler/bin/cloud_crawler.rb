@@ -5,7 +5,7 @@ require 'trollop'
 
 
 opts = Trollop::options do
-  opt :urls, "urls to crawl", :multi => true,  :default => "http://www.ehow.com"
+  opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.ehow.com"
 end
 
 

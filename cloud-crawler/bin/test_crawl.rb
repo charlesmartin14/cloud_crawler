@@ -6,14 +6,10 @@ require 'trollop'
 #TODO:  get this to run
 
 opts = Trollop::options do
-  opt :urls, "urls to crawl", :multi => true,  :default => "http://www.ehow.com"
+  opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.ehow.com"
 end
 
 
-CloudCrawler::standalone_crawl(opts[:urls])  do |c|
-  puts "i am being exec locally"
-  c.on_every_page {   puts cache.incr "count" } 
-end
-
+CloudCrawler::crawl(opts[:urls]) 
 
 

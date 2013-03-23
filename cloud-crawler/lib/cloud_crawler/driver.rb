@@ -1,7 +1,7 @@
 require 'cloud_crawler/dsl_front_end'
 require 'cloud_crawler/exceptions'
 require 'cloud_crawler/crawl_job'
-require 'cloud_crawler/test_worker'
+require 'cloud_crawler/worker'
 
 require 'active_support/inflector'
 require 'active_support/core_ext'
@@ -41,7 +41,7 @@ module CloudCrawler
       :qless_host => 'localhost',
       :qless_port => 6379,
       :qless_db => 0,  # not used yet..not sure how
-      :qless_queues => ["crawl"],
+      :qless_queues => "crawl",
       :verbose => true,
       :interval => 10,
       :job_reserver => 'Ordered'
