@@ -9,4 +9,8 @@ opts = Trollop::options do
 end
 
 
-CloudCrawler::standalone_crawl(opts[:urls]) 
+CloudCrawler::standalone_crawl(opts[:urls], {}) do |crawl|
+  crawl.on_every_page do |p|
+    puts p.url.to_s
+  end
+end
