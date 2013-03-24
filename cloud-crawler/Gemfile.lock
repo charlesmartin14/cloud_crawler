@@ -11,6 +11,7 @@ PATH
       redis-namespace (>= 1.2.1)
       robotex (>= 1.0.0)
       sourcify (>= 0.6.0.rc3)
+      trollop
       webrick (~> 1.3.1)
 
 GEM
@@ -66,6 +67,7 @@ GEM
       sexp_processor (~> 3.2.0)
     tilt (1.3.4)
     tins (0.7.2)
+    trollop (2.0)
     vegas (0.1.11)
       rack (>= 1.0.0)
     webrick (1.3.1)
