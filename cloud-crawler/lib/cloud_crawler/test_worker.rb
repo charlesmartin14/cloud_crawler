@@ -11,7 +11,7 @@ module CloudCrawler
      WORKER_OPTS = {     
       :qless_host => 'localhost',
       :qless_port => 6379,
-      :qless_queues => ["crawl"],
+      :qless_queue => "crawl",
       :interval => 10
      }
     
@@ -20,7 +20,7 @@ module CloudCrawler
       opts.reverse_merge! WORKER_OPTS
       @opts = opts
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port])
-      @queue = @client.queues[opts[:qless_queues].first]
+      @queue = @client.queues[opts[:qless_queue]]
       yield self if block_given?
     end
     
@@ -51,7 +51,7 @@ if __FILE__==$0 then
   opts = Trollop::options do
    opt :qless_host,  :short => "-f", :default => WORKER_OPTS[:qless_host]
    opt :qless_port, :short => "-p", :default => WORKER_OPTS[:qless_port]
-   opt :qless_queues, :short => "-q", :default => WORKER_OPTS[:qless_queues], :multi => true
+   opt :qless_queue, :short => "-q", :default => WORKER_OPTS[:qless_queue]
    opt :interval, :short => "-i", :default => WORKER_OPTS[:interval]
    end
  Worker.run(opts)

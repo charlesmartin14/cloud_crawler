@@ -42,7 +42,7 @@ module CloudCrawler
       :qless_host => 'localhost',
       :qless_port => 6379,
       :qless_db => 0,  # not used yet..not sure how
-      :qless_queues => "crawl",
+      :qless_queue => "crawl",
       :verbose => true,
       :interval => 10,
       :job_reserver => 'Ordered'
@@ -53,8 +53,8 @@ module CloudCrawler
     def initialize(opts = {}, &block)
       opts.reverse_merge! DRIVER_OPTS
       init(opts)
-      @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port], )
-      @queue = @client.queues[opts[:qless_queues].first]
+      @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port] )
+      @queue = @client.queues[opts[:qless_queue]]
       yield self if block_given?
     end
 

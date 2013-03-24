@@ -7,17 +7,17 @@ require 'active_support/core_ext'
 module CloudCrawler
   class TestJob
 
-    QUEUES = ['test_queue']
+    QUEUE = 'test_queue'
     
     attr_accessor :data, :client, :queue
     def initialize(link, referer=nil, depth=nil, opts={}, blocks={})
       @client = Qless::Client.new
-      @queue = @client.queues[QUEUES.first]
+      @queue = @client.queues[QUEUE]
       
       @data = {}
       @data[:link], @data[:referer], @data[:depth] = link, referer, depth
 
-      opts[:qless_queues]= QUEUES
+      opts[:qless_queue]= QUEUE
       @data[:opts] = opts.to_json
      
       @data[:focus_crawl_block] = [].to_json

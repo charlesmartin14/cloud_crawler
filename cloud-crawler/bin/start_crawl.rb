@@ -12,6 +12,6 @@ end
 #CloudCrawler::standalone_crawl(opts[:urls], {}) do |crawl|
 CloudCrawler::crawl(opts[:urls], {}) do |crawl|
   crawl.on_every_page do |p|
-    puts p.url.to_s
+    cache.incr "count"
   end
 end
