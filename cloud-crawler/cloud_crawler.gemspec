@@ -6,7 +6,7 @@ spec = Gem::Specification.new do |s|
   s.rubyforge_project = "cloud_crawler"
   s.platform = Gem::Platform::RUBY
   s.summary = "Cloud Crawler distributed web-spider framework"
-  s.executables = %w[cloud_crawler.rb]
+  s.executables = %w[test_crawl.rb]  #run_worker.rb, start_crawl.rb,
   s.require_path = "lib"
   s.has_rdoc = true
   s.rdoc_options << '-m' << 'README.rdoc' << '-t' << 'CloudCrawler'

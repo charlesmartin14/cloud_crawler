@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'cloud_crawler/dsl_front_end'
 require 'cloud_crawler/exceptions'
 require 'cloud_crawler/crawl_job'
@@ -90,17 +91,5 @@ module CloudCrawler
 end
 
 
-
-if __FILE__==$0 then
-  opts = Trollop::options do
-   opt :qless_host,  :short => "-f", :default => DRIVER_OPTS[:qless_host]
-   opt :qless_port, :short => "-p", :default => DRIVER_OPTS[:qless_port]
-   opt :qless_db, :short => "-d", :default => DRIVER_OPTS[:qless_db]
-   opt :qless_queues, :short => "-q", :default => DRIVER_OPTS[:qless_queues], :multi => true
-   opt :interval, :short => "-i", :default => DRIVER_OPTS[:interval]
-   opt :verbose, :short => "-v", :default => DRIVER_OPTS[:verbose]
-  end
- Driver.crawl(opts)
-end
 
 
