@@ -27,14 +27,38 @@ module CloudCrawler
       return @page_store.size
     end
 
-    it "should crawl all the html pages in a domain by following <a> href's" do
+    it "should crawl all the html pages in a domain by following <a> href's , and populate the bloom filter" do
       pages = []
       pages << FakePage.new('0', :links => ['1', '2'])
       pages << FakePage.new('1', :links => ['3'])
       pages << FakePage.new('2')
       pages << FakePage.new('3')
-
+      
       crawl_link(pages[0].url).should == 4
+      
+      pages.each do |p|
+         @page_store.visited_url?(p.url).should be_true
+      end
+
+    end
+    
+    
+    it "should  not crawl pages in the bloom filter" do
+      pages = []
+      pages << FakePage.new('0', :links => ['1', '2'])
+      pages << FakePage.new('1', :links => ['3'])
+      pages << FakePage.new('2')
+      pages << FakePage.new('3')
+      
+      @page_store.visit_url(pages[3].url.to_s).should be_true
+      @page_store.visited_url?(pages[3].url.to_s).should be_true
+
+      crawl_link(pages[0].url).should == 3
+      
+      pages.each do |p|
+         @page_store.visited_url?(p.url).should be_true
+      end
+
     end
 
     it "should not follow links that leave the original domain" do
