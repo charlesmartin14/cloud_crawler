@@ -18,9 +18,9 @@ module CloudCrawler
       @pages = Redis::Namespace.new("#{@key_prefix}:pages", :redis => redis)
       # # keys.each { |key| delete(key) }  # flushdb ?
       #
-      # items, bits = 100_000, 5
-      # opts[:size] ||= items*bits
-      # opts[:hashes] ||= 7
+      items, bits = 100_000, 5
+      opts[:size] ||= items*bits
+      opts[:hashes] ||= 7
       opts[:namespace] = "#{@key_prefix}:pages_bf"
       opts[:db] = redis
       opts[:seed] = 1364249661
