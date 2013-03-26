@@ -33,11 +33,11 @@ module CloudCrawler
       pages.each do |page|
          url = page.url.to_s
          next if @page_store.visited_url?(url)
-         @page_store.visit_url(url)
 
          do_page_blocks(page)
          page.discard_doc! if @opts[:discard_page_bodies]
          @page_store[url] = page
+         @page_store.visit_url(url)
 
          links = links_to_follow(page)
          links.each do |lnk|
