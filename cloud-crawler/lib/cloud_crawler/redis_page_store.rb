@@ -11,11 +11,13 @@ module CloudCrawler
   class RedisPageStore
     include Enumerable
     
+    attr_reader :key_prefix
+    
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
       @redis = redis
       @key_prefix = opts[:key_prefix] || 'cc'
-      @pages = Redis::Namespace.new("#{@key_prefix}:pages", :redis => redis)
+      @pages = Redis::Namespace.new(name, :redis => redis)
       # # keys.each { |key| delete(key) }  # flushdb ?
       #
       items, bits = 100_000, 5
@@ -33,6 +35,9 @@ module CloudCrawler
       @redis.quit
     end
 
+    def name
+      "#{@key_prefix}:pages"
+    end
 
     def key_for(url)
       url.to_s.gsub("https",'http')

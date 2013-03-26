@@ -6,7 +6,7 @@ require 'cloud_crawler/cookie_store'
 module CloudCrawler
   class HTTP
     
-    log = Logger.new(STDERR)    #TODO where does app log go?  how do we set?
+    @log = Logger.new(STDERR)    #TODO where does app log go?  how do we set?
     
     # Maximum number of redirects to follow on each get_response
     REDIRECT_LIMIT = 5
@@ -54,8 +54,8 @@ module CloudCrawler
         return pages
       rescue Exception => e
         if verbose?
-          log.info e.inspect[]
-          log.info e.backtrace
+          @log.info e.inspect[]
+          @log.info e.backtrace
         end
         return [Page.new(url, :error => e)]
       end
