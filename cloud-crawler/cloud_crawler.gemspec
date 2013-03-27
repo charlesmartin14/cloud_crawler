@@ -21,8 +21,8 @@ spec = Gem::Specification.new do |s|
   s.add_dependency "webrick", "~> 1.3.1"
   s.add_dependency "trollop"
 
-  s.add_dependency "qless", ">=0.9.2"  # cc version
-  s.add_dependency "sourcify", ">=0.6.0.rc3"  # cc version
+  # s.add_dependency "qless", ">=0.9.2"  # cc version
+  # s.add_dependency "sourcify", ">=0.6.0.rc3"  # cc version
 
   s.add_development_dependency "rake", ">=10.0.0"
   s.add_development_dependency "rspec", ">=2.12.0"
