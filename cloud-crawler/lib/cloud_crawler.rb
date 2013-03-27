@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'bundler/setup'
 require 'cloud_crawler'
 require 'cloud_crawler/cookie_store'
 require 'cloud_crawler/http'
