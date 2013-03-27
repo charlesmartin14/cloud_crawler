@@ -53,24 +53,7 @@ module CloudCrawler
       
     
       
-      it "should store urls in bloomfilter" do
-        @store.should respond_to(:touch_url)
-        @store.should respond_to(:touched_url?)
-
-        @store.touch_url(@url)
-        @store.touched_url?(@url).should == true
-        @store.touched_url?("test").should == false
-        
-        @store.touch_urls( ["http://a","http://b","http://c"] )
-        
-      end
-      
-      it "alias touch to visit" do
-        @store.should respond_to(:visit_url)
-        @store.should respond_to(:visit_urls)
-        @store.should respond_to(:visited_url?)
-      end
-      
+     
       
       # it "should implement keys" do
       # @store.should respond_to(:keys)

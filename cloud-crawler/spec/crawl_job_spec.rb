@@ -13,6 +13,7 @@ module CloudCrawler
       @redis = Redis.new
       @redis.flushdb
       @page_store = RedisPageStore.new(@redis)
+      @bloomfilter = RedisUrlBloomfilter.new(@redis)
       @cache =  Redis::Namespace.new("cc:cache", :redis => @redis)
       @opts = {}
     end
@@ -37,7 +38,7 @@ module CloudCrawler
       crawl_link(pages[0].url).should == 4
       
       pages.each do |p|
-         @page_store.visited_url?(p.url).should be_true
+         @bloomfilter.visited_url?(p.url).should be_true
       end
 
     end
@@ -50,13 +51,13 @@ module CloudCrawler
       pages << FakePage.new('2')
       pages << FakePage.new('3')
       
-      @page_store.visit_url(pages[3].url.to_s).should be_true
-      @page_store.visited_url?(pages[3].url.to_s).should be_true
+      @bloomfilter.visit_url(pages[3].url.to_s).should be_true
+      @bloomfilter.visited_url?(pages[3].url.to_s).should be_true
 
       crawl_link(pages[0].url).should == 3
       
       pages.each do |p|
-         @page_store.visited_url?(p.url).should be_true
+         @bloomfilter.visited_url?(p.url).should be_true
       end
 
     end

@@ -11,25 +11,19 @@ module CloudCrawler
   class RedisPageStore
     include Enumerable
     
-    attr_reader :key_prefix
+    DEFAULT_DUMP_RDB = '/etc/redis-6379/dump.rdb'
+    
+    attr_reader :key_prefix, :dump_rdb
+    
     
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
       @redis = redis
       @key_prefix = opts[:key_prefix] || 'cc'
+      @dump_rdb = opts[:dump_rdb] ||= DEFAULT_DUMP_RDB
       @pages = Redis::Namespace.new(name, :redis => redis)
-      # # keys.each { |key| delete(key) }  # flushdb ?
-      #
-      items, bits = 100_000, 5
-      opts[:size] ||= items*bits
-      opts[:hashes] ||= 7
-      opts[:namespace] = "#{@key_prefix}:pages_bf"
-      opts[:db] = redis
-      opts[:seed] = 1364249661
-      
-      # 2.5 mb? 
-      @bloomfilter = BloomFilter::Redis.new(opts)
     end
+
 
     def close
       @redis.quit
@@ -106,26 +100,17 @@ module CloudCrawler
       each { |k, v| result << v }
       result
     end
-
-    # bloom filter methods
-   
-    def touch_url(url)
-      @bloomfilter.insert(key_for url)
+  
+    # very dangerous if all redis are saved
+    # at least can we place in a seperate db?
+    def flush!
+      @redis.save
+      @redis.flushdb
     end
-    alias_method :visit_url, :touch_url
-
-
-    def touch_urls(urls)
-      urls.each { |u| touch_url(u) }
+    
+    def save
+      @redis.save
     end
-    alias_method :visit_urls, :touch_urls 
-
-
-    def touched_url?(url)
-      @bloomfilter.include? key_for url
-    end
-    alias_method :visited_url?, :touched_url? 
-
 
     
 # TODO:  make this a qless job, remove it from here

@@ -76,7 +76,7 @@ module CloudCrawler
       # Returns +false+ otherwise.
       #
       def visit_link?(link, from_page = nil)
-        !@page_store.visited_url?(link) &&
+        !@bloomfilter.visited_url?(link) &&
         !skip_link?(link) &&
         !skip_query_string?(link) &&
         allowed(link) &&

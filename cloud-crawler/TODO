@@ -1,3 +1,25 @@
+chm 27-mar-2013
+
+1. add @page_store.flush!  with simple r.sync for now
+   later, add s3 persistor
+   
+2. spec test for BatchCrawlJob ... assuming local page store
+3. break out bloomfilter / urlstore and pagestore into 2 class
+   test each class seperately
+   allow different config options for starting redis
+   
+4. test batch crawl on livestrong.com
+     is number of jobs reduced
+     does this make sense
+     
+5.  measure growth rate of bloomfilter, redis job queue
+
+6.  implement actual flush-to-s3  using redis-flush  / redis-s3  function
+  re-implement as a simple gem / mixin
+  manage dependencies explicitly, not with installer yet 
+  
+  
+
 chm 20-mar-2013
 
 1.  finish driver spec

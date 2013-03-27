@@ -1,5 +1,6 @@
 require 'cloud_crawler/http'
 require 'cloud_crawler/redis_page_store'
+require 'cloud_crawler/redis_url_bloomfilter'
 require 'cloud_crawler/dsl_core'
 require 'active_support/inflector'
 require 'active_support/core_ext'
@@ -13,6 +14,7 @@ module CloudCrawler
       @key_prefix = @opts[:key_prefix] || 'cc'
       @cache = Redis::Namespace.new("#{@key_prefix}:cache", :redis => job.client.redis)
       @page_store = RedisPageStore.new(job.client.redis,@opts)
+      @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@opts[:qless_queue]]   
     end
   
@@ -32,16 +34,16 @@ module CloudCrawler
       pages = http.fetch_pages(link, referer, depth)
       pages.each do |page|
          url = page.url.to_s
-         next if @page_store.visited_url?(url)
+         next if @bloomfilter.visited_url?(url)
 
          do_page_blocks(page)
          page.discard_doc! if @opts[:discard_page_bodies]
          @page_store[url] = page
-         @page_store.visit_url(url)
+         @bloomfilter.visit_url(url)
 
          links = links_to_follow(page)
          links.each do |lnk|
-            next if @page_store.visited_url?(lnk)  
+            next if @bloomfilter.visited_url?(lnk)  
             data[:link], data[:referer], data[:depth] = lnk.to_s,  page.referer.to_s,  page.depth + 1
             @queue.put(CrawlJob, data)
          end
