@@ -40,10 +40,10 @@ module CloudCrawler
       init(job)
 
       data = job.data.symbolize_keys
-      urls = JSON.parse(data[:urls]).map(&:symbolize_keys!)
-
-      puts urls
+      urls = JSON.parse(data[:urls])
+            
       pages = urls.map do |url_data|
+        url_data.symbolize_keys!
         link, referer, depth = url_data[:link], url_data[:referer], url_data[:depth]
         next if link.nil? or  link.empty? or link == :END
 
@@ -51,10 +51,12 @@ module CloudCrawler
         http.fetch_pages(link, referer, depth)
       end
       
+      
       pages.flatten!.compact!
 
-      pages.reject! { |pg|  @bloomfilter.visited_url?(pg.url.to_s) }
+      pages.reject! { |page|  @bloomfilter.visited_url?(page.url.to_s) }
       return if pages.empty?
+      
 
       outbound_urls = []
       pages.each do |page|
@@ -68,16 +70,17 @@ module CloudCrawler
 
         links = links_to_follow(page)
         links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }
-        outbound_urls << links.map do |lnk|
-          { :link => lnk.to_json, :referer=> page.referer.to_s, :depth=> page.depth + 1}
+         links.each do |lnk|
+          outbound_urls <<{ :link => lnk.to_s, :referer => page.referer.to_s, :depth => page.depth + 1}
         end
       end
-      
+            
       # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here
-      saved_urls = @page_store.flush!  
-
+      # TODO: saved_urls = @page_store.flush!  if opts[:flush]
+      saved_urls = @page_store.keys
+      
       # add pages to bloomfilter only if store to s3 succeeds
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }
 

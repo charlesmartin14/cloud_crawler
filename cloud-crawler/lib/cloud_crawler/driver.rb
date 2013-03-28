@@ -67,7 +67,7 @@ module CloudCrawler
     #
     # Convenience method to start a new crawl
     #
- def self.crawl(urls, opts = {}, &block)
+   def self.crawl(urls, opts = {}, &block)
         self.new(opts) do |core|
           yield core if block_given?
           core.load_urls(urls)
@@ -96,12 +96,14 @@ module CloudCrawler
       
       
       def load_batch_urls(urls)
-              urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
- urls.each{ |url| url.path = '/' if url.path.empty? }
+        puts "loading batch urls"
+      urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
+      urls.each{ |url| url.path = '/' if url.path.empty? }
       
       data = block_sources
-      data[:opts] = @opts.to_json
-      data[:urls] = urls.map do |url|  { :link => url.to_s } end
+      data[:opts] = @opts.to_json   # does qless deep serialize out data for us?
+      data[:urls] = urls.map { |url|  { :link => url.to_s } }.to_json 
+        puts "the data is #{data}"
       @queue.put(BatchCrawlJob, data)
       end
     
