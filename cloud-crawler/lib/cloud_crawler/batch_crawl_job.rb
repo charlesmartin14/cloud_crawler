@@ -28,6 +28,7 @@ module CloudCrawler
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@opts[:qless_queue]]
       @max_slice = @opts[:max_slice] || MAX_SLICE_DEFAULT
+      @flush =  @opts[:flush] 
     end
 
     def self.cache
@@ -78,8 +79,7 @@ module CloudCrawler
       # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here
-      # TODO: saved_urls = @page_store.flush!  if opts[:flush]
-      saved_urls = @page_store.keys
+      saved_urls = if @flush then  @page_store.flush! else @page_store.keys end
       
       # add pages to bloomfilter only if store to s3 succeeds
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }

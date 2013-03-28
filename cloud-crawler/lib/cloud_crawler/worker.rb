@@ -16,7 +16,6 @@ module CloudCrawler
     # ENV['VERBOSE'] = opts[:verbose].to_s
     #  ENV['RUN_AS_SINGLE_PROCESS'] = 'true'
 
-      
       Qless::Worker::start
     end
     
