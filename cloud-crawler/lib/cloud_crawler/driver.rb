@@ -2,6 +2,7 @@
 require 'cloud_crawler/dsl_front_end'
 require 'cloud_crawler/exceptions'
 require 'cloud_crawler/crawl_job'
+require 'cloud_crawler/batch_crawl_job'
 require 'cloud_crawler/worker'
 
 require 'active_support/inflector'
@@ -22,6 +23,11 @@ module CloudCrawler
   def CloudCrawler.crawl(urls, opts = {}, &block)
     Driver.crawl(urls, opts, &block)
   end
+  
+  def CloudCrawler.batch_crawl(urls, opts = {}, &block)
+    Driver.batch_crawl(urls, opts, &block)
+  end
+  
   
   
   #
@@ -61,33 +67,45 @@ module CloudCrawler
     #
     # Convenience method to start a new crawl
     #
-    def self.crawl(urls, opts = {}, &block)
-      self.new(opts) do |core|
-        yield core if block_given?
-        core.run(urls)
+ def self.crawl(urls, opts = {}, &block)
+        self.new(opts) do |core|
+          yield core if block_given?
+          core.load_urls(urls)
+        end
+      end
+
+      
+   def load_urls(urls)
+      urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
+      urls.each{ |url| url.path = '/' if url.path.empty? }
+      data = block_sources
+      data[:opts] = @opts.to_json
+      urls.each do |url|
+        data[:link] = url.to_s
+        @queue.put(CrawlJob, data)
       end
     end
 
- 
-    def run(urls)
-      load_urls(urls)
-    end
-    
-    def load_urls(urls)
-        urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
-        urls.each{ |url| url.path = '/' if url.path.empty? }
-        
-        data = block_sources
-        data[:opts] = @opts.to_json
-        urls.each do |url|
-          data[:link] = url.to_s
-          @queue.put(CrawlJob, data)
-        end
-    end
-    
-    
-   end
 
+ def self.batch_crawl(urls, opts = {}, &block)
+      self.new(opts) do |core|
+        yield core if block_given?
+        core.load_batch_urls(urls)
+      end
+    end
+      
+      
+      def load_batch_urls(urls)
+              urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
+ urls.each{ |url| url.path = '/' if url.path.empty? }
+      
+      data = block_sources
+      data[:opts] = @opts.to_json
+      data[:urls] = urls.map do |url|  { :link => url.to_s } end
+      @queue.put(BatchCrawlJob, data)
+      end
+    
+  end
 end
 
 

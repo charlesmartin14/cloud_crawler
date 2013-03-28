@@ -3,19 +3,14 @@ require 'redis-namespace'
 require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
-
-    
 module CloudCrawler
-  
-  
   class RedisPageStore
     include Enumerable
-    
+
     DEFAULT_DUMP_RDB = '/etc/redis-6379/dump.rdb'
-    
+
     attr_reader :key_prefix, :dump_rdb
-    
-    
+
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
       @redis = redis
@@ -23,7 +18,6 @@ module CloudCrawler
       @dump_rdb = opts[:dump_rdb] ||= DEFAULT_DUMP_RDB
       @pages = Redis::Namespace.new(name, :redis => redis)
     end
-
 
     def close
       @redis.quit
@@ -36,8 +30,7 @@ module CloudCrawler
     def key_for(url)
       url.to_s.gsub("https",'http')
     end
-    
-    
+
     # We typically index the hash with a URI,
     # but convert it to a String for easier retrieval
     def [](url)
@@ -58,7 +51,7 @@ module CloudCrawler
     def has_page?(url)
       @pages.exists(key_for url)
     end
-    
+
     def has_key?(key)
       @pages.exists(key)
     end
@@ -85,7 +78,7 @@ module CloudCrawler
     def page_urls
 
     end
-    
+
     def keys
       @pages.keys("*")
     end
@@ -100,61 +93,62 @@ module CloudCrawler
       each { |k, v| result << v }
       result
     end
-  
-    # very dangerous if all redis are saved
-    # at least can we place in a seperate db?
+
+    # # very dangerous if all redis are saved
+    # # at least can we place in a seperate db?
+    #  wait for this
+
+    # def flush!
+    # @redis.save
+    # @redis.flushdb
+    # end
+    #
+    # def save
+    # @redis.save
+    # end
+
+    # simple implementation for testing locally
     def flush!
-      @redis.save
-      @redis.flushdb
-    end
-    
-    def save
-      @redis.save
+      keys, filename = save_keys
+      #push_to_s3(filename)
+      delete!(keys)
     end
 
-    
-# TODO:  make this a qless job, remove it from here
-    # #
-    # # save snapshot of existing pages to s3
-    # # delete pages when done
-    # # TODO:  add thread that monitors num pages, runs and serialized
-    # # TODO:try to add aws-s3 gem with creds passed on command line?  really?
-    # #  first, just check that s3cmd works on current deployment
-    # # TODO:  add node id in case multiple saves are occuring (how?)    
-    # def serialize_pages!
-      # keys = @pages.keys "*"
-      # num = keys.size
-#       
-      # filename = "#{@key_prefix}:pages.#{Time.now.getutc}.jsons.gz"
-      # Zlib::GzipWriter.open(filename) do |gz|
-         # keys.each { |k| f << @pages[k] }
-      # end
-#       
-      # md5 = Digest::MD5.file(filename).hexdigest  
-#           
-      # #  better to use aws-s3 library ??
-#       
-      # tmp_file = "tmp_pages"
-      # system "s3cmd put #{filename}"
-      # system "s3cmd get #{filename} #{tmp_file}"
-# 
-      # tmp_md5 = Digest::MD5.file(tmp_file).hexdigest  
-#       
-      # if md5==tmp_md5 then
-        # File.delete(tmp_file)
-        # @pages.pipelined do
-          # keys.each { |k| @pages.del k }
-        # end
-      # else
-        # num = -1
-      # end
-#       
-#  
-      # return num
-    # end
-#     
-    
-  
+    # gets a snapshot of the keys
+    def save_keys
+      #TODO:  add worker id to filename
+      filename = "#{@key_prefix}:pages.#{Time.now.getutc}.jsons.gz"
+      Zlib::GzipWriter.open(filename) do |gz|
+        keys.each { |k| f << @pages[k] << "\n" }
+      end
+
+      return keys, filename
+
+    end
+
+    def push_to_s3(filename)
+      md5 = Digest::MD5.file(filename).hexdigest
+
+      #  better to use aws-s3 library ??
+
+      tmp_file = "tmp_pages"
+      system "s3cmd put #{filename}"
+      system "s3cmd get #{filename} #{tmp_file}"
+
+      tmp_md5 = Digest::MD5.file(tmp_file).hexdigest
+      File.delete(tmp_file)
+
+      return md5==tmp_md5
+    end
+
+    # this is so dumb...can't ruby redis cli take a giant list of keys?
+    def delete!(keys)
+      @pages.pipelined do
+        keys.each { |k| @pages.del k }
+      end
+      return keys
+    end
+
     private
 
     def rget(rkey)
