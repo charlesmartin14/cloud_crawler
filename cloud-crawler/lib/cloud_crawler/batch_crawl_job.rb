@@ -1,5 +1,6 @@
 require 'cloud_crawler/http'
 require 'cloud_crawler/redis_page_store'
+require 'cloud_crawler/redis_url_bloomfilter'
 require 'cloud_crawler/dsl_core'
 require 'active_support/inflector'
 require 'active_support/core_ext'
@@ -24,6 +25,7 @@ module CloudCrawler
       @key_prefix = @opts[:key_prefix] || 'cc'
       @cache = Redis::Namespace.new("#{@key_prefix}:cache", :redis => job.client.redis)
       @page_store = RedisPageStore.new(job.client.redis,@opts)
+      @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@opts[:qless_queue]]
       @max_slice = @opts[:max_slice] || MAX_SLICE_DEFAULT
     end
@@ -31,23 +33,27 @@ module CloudCrawler
     def self.cache
       @cache
     end
-
+    
+    
     def self.perform(job)
       super(job)
       init(job)
 
       data = job.data.symbolize_keys
-      urls = JSON.parse(data[:urls])
+      urls = JSON.parse(data[:urls]).map(&:symbolize_keys!)
 
+      puts urls
       pages = urls.map do |url_data|
         link, referer, depth = url_data[:link], url_data[:referer], url_data[:depth]
-        next if link.empty or link == :END
+        next if link.nil? or  link.empty? or link == :END
 
         http = CloudCrawler::HTTP.new(@opts)
         http.fetch_pages(link, referer, depth)
       end
+      
+      pages.flatten!.compact!
 
-      pages.reject! { |p|  @page_store.visited_url?(p.url.to_s) }
+      pages.reject! { |pg|  @bloomfilter.visited_url?(pg.url.to_s) }
       return if pages.empty?
 
       outbound_urls = []
@@ -61,19 +67,21 @@ module CloudCrawler
         @page_store[url] = page
 
         links = links_to_follow(page)
-        links.reject! { |lnk| @page_store.visited_url?(lnk) }
+        links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }
         outbound_urls << links.map do |lnk|
           { :link => lnk.to_json, :referer=> page.referer.to_s, :depth=> page.depth + 1}
         end
       end
+      
+      # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here
-      saved_urls = @page_store.flush!
+      saved_urls = @page_store.flush!  
 
       # add pages to bloomfilter only if store to s3 succeeds
-      saved_urls.each { |url|  @page_store.visit_url(url) }
+      saved_urls.each { |url|  @bloomfilter.visit_url(url) }
 
-      outbound_urls.flatten.compact.each_slice(max_slice) do |urls|
+      outbound_urls.flatten.compact.each_slice(@max_slice) do |urls|
         data[:urls] = urls.to_json
         @queue.put(BatchCrawlJob, data)
       end

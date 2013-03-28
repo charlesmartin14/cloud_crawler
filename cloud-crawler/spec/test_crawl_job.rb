@@ -5,7 +5,7 @@ require 'json'
 require 'active_support/core_ext'
 
 module CloudCrawler
-  class TestJob
+  class TestCrawlJob
 
     QUEUE = 'test_queue'
     

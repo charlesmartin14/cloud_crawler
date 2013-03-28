@@ -2,7 +2,7 @@ $:.unshift(File.dirname(__FILE__))
 require 'spec_helper'
 require 'redis'
 require 'cloud_crawler/crawl_job'
-require 'test_job'
+require 'test_crawl_job'
 require 'sourcify'
 
 module CloudCrawler
@@ -19,7 +19,7 @@ module CloudCrawler
     end
 
     def crawl_link(url, opts={}, blocks={})
-      job = TestJob.new(url, referer=nil, depth=nil, opts=opts, blocks=blocks)
+      job = TestCrawlJob.new(url, referer=nil, depth=nil, opts=opts, blocks=blocks)
       CrawlJob.perform(job)
       @page_store.size.should == 1
       while qjob = job.queue.pop

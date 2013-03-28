@@ -119,7 +119,7 @@ module CloudCrawler
       #TODO:  add worker id to filename
       filename = "#{@key_prefix}:pages.#{Time.now.getutc}.jsons.gz"
       Zlib::GzipWriter.open(filename) do |gz|
-        keys.each { |k| f << @pages[k] << "\n" }
+        keys.each { |k| gz << @pages[k] << "\n" }
       end
 
       return keys, filename
