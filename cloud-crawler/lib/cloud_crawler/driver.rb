@@ -96,14 +96,12 @@ module CloudCrawler
       
       
       def load_batch_urls(urls)
-        puts "loading batch urls"
-      urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
+        urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
       urls.each{ |url| url.path = '/' if url.path.empty? }
       
       data = block_sources
       data[:opts] = @opts.to_json   # does qless deep serialize out data for us?
       data[:urls] = urls.map { |url|  { :link => url.to_s } }.to_json 
-        puts "the data is #{data}"
       @queue.put(BatchCrawlJob, data)
       end
     
