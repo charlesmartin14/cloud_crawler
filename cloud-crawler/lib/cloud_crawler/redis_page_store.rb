@@ -74,10 +74,7 @@ module CloudCrawler
       @pages.keys("*").size
     end
 
-    #TODO: implement and test
-    def page_urls
-
-    end
+  
 
     def keys
       @pages.keys("*")
@@ -117,9 +114,12 @@ module CloudCrawler
     # gets a snapshot of the keys
     def save_keys
       #TODO:  add worker id to filename
-      filename = "#{@key_prefix}:pages.#{Time.now.getutc}.jsons.gz"
+      filename = "#{@key_prefix}:pages.#{Time.now.getutc.to_s.gsub(/\s/,'')}.jsons.gz"
       Zlib::GzipWriter.open(filename) do |gz|
-        keys.each { |k| gz << @pages[k] << "\n" }
+        keys.each do |k| 
+          gz.write @pages[k]
+          gz.write "\n"
+          end
       end
 
       return keys, filename

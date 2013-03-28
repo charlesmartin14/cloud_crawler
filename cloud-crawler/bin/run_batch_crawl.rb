@@ -15,7 +15,6 @@ opts = Trollop::options do
   opt :interval, "", :short => "-i", :default => 5
   opt :job_reserver, "", :short => "-r", :default => 'Ordered'
   opt :verbose, "", :short => "-v", :default => true
-  opt :flush,  "", :short => "-x", :default => true
 end
 puts opts
 CloudCrawler::Worker.run(opts)

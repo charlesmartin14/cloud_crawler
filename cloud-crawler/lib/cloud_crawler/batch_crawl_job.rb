@@ -39,7 +39,7 @@ module CloudCrawler
     def self.perform(job)
       super(job)
       init(job)
-
+      
       data = job.data.symbolize_keys
       urls = JSON.parse(data[:urls])
             
@@ -79,6 +79,7 @@ module CloudCrawler
       # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here
+      puts @flush
       saved_urls = if @flush then  @page_store.flush! else @page_store.keys end
       
       # add pages to bloomfilter only if store to s3 succeeds

@@ -14,7 +14,7 @@ module CloudCrawler
     #  ENV['JOB_RESERVER'] = opts[:job_reserver]
       ENV['INTERVAL'] = opts[:interval].to_s
     # ENV['VERBOSE'] = opts[:verbose].to_s
-    #  ENV['RUN_AS_SINGLE_PROCESS'] = 'true'
+    # ENV['RUN_AS_SINGLE_PROCESS'] = 'true'
 
       Qless::Worker::start
     end
