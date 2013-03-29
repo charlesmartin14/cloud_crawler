@@ -17,6 +17,7 @@ module CloudCrawler
       @key_prefix = opts[:key_prefix] || 'cc'
       @dump_rdb = opts[:dump_rdb] ||= DEFAULT_DUMP_RDB
       @pages = Redis::Namespace.new(name, :redis => redis)
+      @push_to_s3 = true# opts[:push_to_s3] 
     end
 
     def close
@@ -107,7 +108,7 @@ module CloudCrawler
     # simple implementation for testing locally
     def flush!
       keys, filename = save_keys
-      #push_to_s3(filename)
+      push_to_s3!(filename) if @push_to_s3
       delete!(keys)
     end
 
@@ -126,19 +127,20 @@ module CloudCrawler
 
     end
 
-    def push_to_s3(filename)
-      md5 = Digest::MD5.file(filename).hexdigest
+    def push_to_s3!(filename)
+      #md5 = Digest::MD5.file(filename).hexdigest
 
       #  better to use aws-s3 library ??
 
-      tmp_file = "tmp_pages"
-      system "s3cmd put #{filename}"
-      system "s3cmd get #{filename} #{tmp_file}"
+      #tmp_file = "tmp_pages"
+      system "s3cmd put #{filename} s3://cloud-crawler"
+      #system "s3cmd get #{filename} #{tmp_file}"
 
-      tmp_md5 = Digest::MD5.file(tmp_file).hexdigest
-      File.delete(tmp_file)
+      #tmp_md5 = Digest::MD5.file(tmp_file).hexdigest
+      # naively assume succes
+      File.delete(filename)
 
-      return md5==tmp_md5
+      #return md5==tmp_md5
     end
 
     # this is so dumb...can't ruby redis cli take a giant list of keys?
