@@ -17,7 +17,7 @@ module CloudCrawler
   class BatchCrawlJob
     include DslCore
 
-    MAX_SLICE_DEFAULT = 100
+    MAX_SLICE_DEFAULT = 1000
 
     # TODO: test locally, then break of queue, bf, and page store
     # url_filter = @url_filter.new  # take bloom filter out of page store
@@ -25,9 +25,9 @@ module CloudCrawler
       @key_prefix = @opts[:key_prefix] || 'cc'
       @mcache = Redis::Namespace.new("#{@key_prefix}:mcache", :redis =>  job.client.redis)
       
-      redis = Redis.new
-      @lcache = Redis::Namespace.new("#{@key_prefix}:lcache", :redis =>  redis)
-      @page_store = RedisPageStore.new(redis,@opts)  # #{@key_prefix}:pages"
+      redis = Redis.new # local host -- should be the same as job.client.redis on same machine...but maybe not?
+      @lcache = Redis::Namespace.new("#{@key_prefix}:lcache", :redis =>  local_redis)
+      @page_store = RedisPageStore.new(local_redis,@opts)  # #{@key_prefix}:pages"
       
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@opts[:qless_queue]]
