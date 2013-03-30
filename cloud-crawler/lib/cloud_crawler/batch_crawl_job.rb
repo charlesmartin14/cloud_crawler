@@ -43,10 +43,7 @@ module CloudCrawler
       @lcache
     end
     
-    def self.lpcache
-      @lpcache
-    end
-    
+  
     
     def self.perform(job)
       super(job)
