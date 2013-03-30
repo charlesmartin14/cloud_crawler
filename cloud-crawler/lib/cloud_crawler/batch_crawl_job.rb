@@ -11,7 +11,7 @@ module CloudCrawler
   # save to local or global cache
   #  DSL:   mcache   master_cache
   #         lcache   local_cache
-  #         lpcache  local_persisted_cache
+  #         lpcache  local_persisted_cache  # not used, pages are persisted in different namespace
   #         bloomfilter
   #
   class BatchCrawlJob
@@ -23,16 +23,28 @@ module CloudCrawler
     # url_filter = @url_filter.new  # take bloom filter out of page store
     def self.init(job)
       @key_prefix = @opts[:key_prefix] || 'cc'
-      @cache = Redis::Namespace.new("#{@key_prefix}:cache", :redis => job.client.redis)
-      @page_store = RedisPageStore.new(job.client.redis,@opts)
+      @mcache = Redis::Namespace.new("#{@key_prefix}:mcache", :redis =>  job.client.redis)
+      
+      redis = Redis.new
+      @lcache = Redis::Namespace.new("#{@key_prefix}:lcache", :redis =>  redis)
+      @page_store = RedisPageStore.new(redis,@opts)  # #{@key_prefix}:pages"
+      
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@opts[:qless_queue]]
       @max_slice = @opts[:max_slice] || MAX_SLICE_DEFAULT
       @flush =  @opts[:flush] 
     end
 
-    def self.cache
-      @cache
+    def self.mcache
+      @mcache
+    end
+    
+    def self.lcache
+      @lcache
+    end
+    
+    def self.lpcache
+      @lpcache
     end
     
     

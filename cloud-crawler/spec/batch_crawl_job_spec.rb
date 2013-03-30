@@ -14,7 +14,7 @@ module CloudCrawler
       @redis.flushdb
       @page_store = RedisPageStore.new(@redis)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
-      @cache =  Redis::Namespace.new("cc:cache", :redis => @redis)
+      @cache =  Redis::Namespace.new("cc:lcache", :redis => @redis)
       @opts = {}
     end
 
@@ -143,7 +143,7 @@ module CloudCrawler
 
       # problem:  how to get the state back -- it is not persisted in the run
       # need to persist to redis or page-store
-      b = {:on_every_page_blocks => [Proc.new { cache.incr "count" }.to_source].to_json }
+      b = {:on_every_page_blocks => [Proc.new { lcache.incr "count" }.to_source].to_json }
       crawl_link(pages[0].url,opts={},blocks=b)
       @cache.get("count").should == "3"
     end

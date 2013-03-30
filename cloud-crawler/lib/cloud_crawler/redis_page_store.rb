@@ -7,7 +7,7 @@ module CloudCrawler
   class RedisPageStore
     include Enumerable
 
-    DEFAULT_DUMP_RDB = '/etc/redis-6379/dump.rdb'
+    DEFAULT_DUMP_RDB = "/var/lib/redis/dump-6379.rdb"
 
     attr_reader :key_prefix, :dump_rdb
 
@@ -15,9 +15,9 @@ module CloudCrawler
     def initialize(redis, opts = {})
       @redis = redis
       @key_prefix = opts[:key_prefix] || 'cc'
-      @dump_rdb = opts[:dump_rdb] ||= DEFAULT_DUMP_RDB
+      @dump_rdb = opts[:dump_rdb] ||= DEFAULT_DUMP_RDB  # not used yet
       @pages = Redis::Namespace.new(name, :redis => redis)
-      @push_to_s3 = true# opts[:push_to_s3] 
+      @push_to_s3 = opts[:push_to_s3] 
     end
 
     def close
