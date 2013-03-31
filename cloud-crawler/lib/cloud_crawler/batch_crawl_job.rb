@@ -25,7 +25,8 @@ module CloudCrawler
       @key_prefix = @opts[:key_prefix] || 'cc'
       @mcache = Redis::Namespace.new("#{@key_prefix}:mcache", :redis =>  job.client.redis)
       
-      local_redis = Redis.new # local host -- should be the same as job.client.redis on same machine...but maybe not?
+      # local host -- should be the same as job.client.redis on same machine...but maybe not?
+      local_redis = Redis.new(:host=>'localhost')
       @lcache = Redis::Namespace.new("#{@key_prefix}:lcache", :redis =>  local_redis)
       @page_store = RedisPageStore.new(local_redis,@opts)  # #{@key_prefix}:pages"
       
