@@ -115,7 +115,7 @@ module CloudCrawler
     # gets a snapshot of the keys
     def save_keys
       #TODO:  add worker id to filename
-      filename = "#{@key_prefix}:pages.#{Time.now.getutc.to_s.gsub(/\s/,'')}.jsons.gz"
+      filename = "#{@key_prefix}_pages.#{Time.now.getutc.to_s.gsub(/\s/,'').gsub(/:/,"-") }.jsons.gz"
       Zlib::GzipWriter.open(filename) do |gz|
         keys.each do |k| 
           gz.write @pages[k]
@@ -127,13 +127,14 @@ module CloudCrawler
 
     end
 
-    def push_to_s3!(filename)
+    def push_to_s3!(filename, crawl)
       #md5 = Digest::MD5.file(filename).hexdigest
 
       #  better to use aws-s3 library ??
 
       #tmp_file = "tmp_pages"
-      system "s3cmd put #{filename} s3://cloud-crawler"
+      filename.gsub!(/:/,"_")  # just in case it slips in
+      system "s3cmd put #{filename} s3://cloud-crawler/"
       #system "s3cmd get #{filename} #{tmp_file}"
 
       #tmp_md5 = Digest::MD5.file(tmp_file).hexdigest
