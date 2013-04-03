@@ -127,7 +127,7 @@ module CloudCrawler
 
     end
 
-    def push_to_s3!(filename, crawl)
+    def push_to_s3!(filename)
       #md5 = Digest::MD5.file(filename).hexdigest
 
       #  better to use aws-s3 library ??
