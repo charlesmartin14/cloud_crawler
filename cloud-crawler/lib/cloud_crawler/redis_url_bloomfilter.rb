@@ -3,7 +3,7 @@ require 'redis-namespace'
 require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
-require 'log'
+require 'logger'
 
     
 module CloudCrawler
@@ -46,6 +46,7 @@ module CloudCrawler
     def touch_url(url)
       @log.info "touch #{url}  #{key_for url}"
       @bloomfilter.insert(key_for url)
+      @redis["urls:#{key_for url}"]="touched"
     end
     alias_method :visit_url, :touch_url
 
@@ -59,6 +60,7 @@ module CloudCrawler
     def touched_url?(url)
       @log.info "touched? #{url}  #{key_for url}"
       @bloomfilter.include?(key_for url)
+      return !@redis["urls:#{key_for url}"].nil?
     end
     alias_method :visited_url?, :touched_url? 
 
