@@ -7,9 +7,9 @@ require 'trollop'
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.livestrong.com"
-  opt :flush,  "", :short => "-x", :default => true
-  opt :max_slice, "", :short => "-m", :default => 1000
-  opt :push_to_s3, "", :short => "-p", :default => true
+  opt :flush,  "", :short => "-x", :default => false
+  opt :max_slice, "", :short => "-m", :default => 100
+  opt :push_to_s3, "", :short => "-p", :default => false
   opt :dump_rdb, "", :short => "-d", :default => "/var/lib/redis/dump-6379.rdb"
 end
 

@@ -6,6 +6,7 @@ require 'trollop'
 require 'cloud_crawler'
 require 'cloud_crawler/worker'
 
+#same as run worker...hah
 
 opts = Trollop::options do
   opt :qless_host, "", :short => "-h", :default => 'localhost'
@@ -15,6 +16,7 @@ opts = Trollop::options do
   opt :interval, "", :short => "-i", :default => 0
   opt :job_reserver, "", :short => "-r", :default => 'Ordered'
   opt :verbose, "", :short => "-v", :default => true
+  opt :single_process, "run as single process", :short => "-s", :default => false
 end
 puts opts
 CloudCrawler::Worker.run(opts)

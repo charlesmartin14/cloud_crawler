@@ -44,7 +44,7 @@ module CloudCrawler
          links = links_to_follow(page)
          links.each do |lnk|
             next if @bloomfilter.visited_url?(lnk)  
-            data[:link], data[:referer], data[:depth] = lnk.to_s,  page.referer.to_s,  page.depth + 1
+            data[:link], data[:referer], data[:depth] =  lnk.to_s,  page.referer.to_s,  page.depth + 1
             @queue.put(CrawlJob, data)
          end
         
