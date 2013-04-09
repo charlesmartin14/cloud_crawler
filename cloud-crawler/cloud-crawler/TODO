@@ -1,0 +1,68 @@
+chm 27-mar-2013
+
+1. add @page_store.flush!  with simple r.sync for now
+   later, add s3 persistor
+   
+2. spec test for BatchCrawlJob ... assuming local page store
+3. break out bloomfilter / urlstore and pagestore into 2 class
+   test each class seperately
+   allow different config options for starting redis
+   
+4. test batch crawl on livestrong.com
+     is number of jobs reduced
+     does this make sense
+     
+5.  measure growth rate of bloomfilter, redis job queue
+
+6.  implement actual flush-to-s3  using redis-flush  / redis-s3  function
+  re-implement as a simple gem / mixin
+  manage dependencies explicitly, not with installer yet 
+  
+  
+
+chm 20-mar-2013
+
+1.  finish driver spec
+2.  standalone worker in driver
+3.  client workers .. run in different windows
+4.  replace CLI w/trollop
+
+replace al of this with Qless workers,rake task, and set dsls
+
+5.  try sinatra gui on laptop
+6.  fix sinarta specs (redo?) in qless
+7.  redis serializer as a qless job .. to s3 , fuse, whatever
+8.  start blog post
+9.  anything useful in scrapi?  and cobweb
+10.  test on an actual site like ehow, livestrong, etc
+11. integrate log4r ... make sure loging works properly
+where do clients and workers log?
+
+12.  get sebastian's chef scripts working, and test this on the cloud
+make sure sinatra spools up, we have multiple nodes
+
+13.  can we monitor and reset ip addresses?
+     can crawler monitor when it fails?
+     
+14.  real DSLs to test
+running counter
+title extractor
+
+scrapi-like api for pulling related links
+not yet...but kight be able to resurrect
+
+other:
+
+click tracker
+hdfs interface / redis serializer
+liblinear
+nmf 
+
+new bloom filter...high performance, based on cityhash and tuning
+
+dsl building tools:  basic blog talk on DSLs of various forms
+
+
+    
+
+  

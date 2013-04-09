@@ -1,0 +1,21 @@
+127.0.0.1 - - [23/Mar/2013 19:32:01] "GET /qless " 200 - 0.0099
+127.0.0.1 - - [23/Mar/2013 19:32:01] "GET /favicon.ico " 404 445 0.0006
+127.0.0.1 - - [23/Mar/2013 19:32:03] "GET / " 200 7 0.0004
+127.0.0.1 - - [23/Mar/2013 19:32:03] "GET /favicon.ico " 404 445 0.0005
+127.0.0.1 - - [23/Mar/2013 19:32:04] "GET /favicon.ico " 404 445 0.0005
+127.0.0.1 - - [23/Mar/2013 19:32:05] "GET /qless " 200 - 0.0035
+127.0.0.1 - - [23/Mar/2013 19:32:05] "GET /favicon.ico " 404 445 0.0005
+127.0.0.1 - - [23/Mar/2013 19:32:12] "GET /qless/ " 404 440 0.0005
+127.0.0.1 - - [23/Mar/2013 19:32:12] "GET /favicon.ico " 404 445 0.0005
+127.0.0.1 - - [23/Mar/2013 19:32:18] "GET /qless/ " 404 440 0.0007
+127.0.0.1 - - [23/Mar/2013 19:32:18] "GET /favicon.ico " 404 445 0.0007
+/Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/lib/nack/server.rb:87:in `eof?': closed stream (IOError)
+	from /Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/lib/nack/server.rb:87:in `block (2 levels) in start'
+	from /Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/lib/nack/server.rb:86:in `each'
+	from /Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/lib/nack/server.rb:86:in `block in start'
+	from /Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/lib/nack/server.rb:66:in `loop'
+	from /Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/lib/nack/server.rb:66:in `start'
+	from /Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/lib/nack/server.rb:13:in `run'
+	from /Users/charlesmartin14/Library/Application Support/Pow/Versions/0.4.0/node_modules/nack/bin/nack_worker:4:in `<main>'
+127.0.0.1 - - [23/Mar/2013 19:32:31] "GET /qless " 200 - 0.0096
+127.0.0.1 - - [23/Mar/2013 19:32:31] "GET /favicon.ico " 404 445 0.0006
