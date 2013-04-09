@@ -50,6 +50,7 @@ module CloudCrawler
       super(job)
       init(job)
       
+     
       data = job.data.symbolize_keys
       urls = JSON.parse(data[:urls])
             
