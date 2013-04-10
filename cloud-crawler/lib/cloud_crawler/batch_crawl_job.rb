@@ -57,10 +57,11 @@ module CloudCrawler
       pages = urls.map do |url_data|
         url_data.symbolize_keys!
         link, referer, depth = url_data[:link], url_data[:referer], url_data[:depth]
-        next if link.nil? or  link.empty? or link == :END
+        next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s) 
         
         http = CloudCrawler::HTTP.new(@opts)
+        next if http.nil?
         http.fetch_pages(link, referer, depth)
       end
       
