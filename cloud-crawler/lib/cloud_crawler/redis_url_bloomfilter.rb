@@ -26,7 +26,7 @@ module CloudCrawler
       
       # 2.5 mb? 
      @bloomfilter = BloomFilter::Redis.new(opts)
-      @log = Logger.new('/tmp/bf.log')
+     # @log = Logger.new('/tmp/bf.log')
       
     end
 
@@ -44,7 +44,7 @@ module CloudCrawler
     # bloom filter methods
    
     def touch_url(url)
-     @log.info "touch #{url}  #{key_for url}"
+    # @log.info "touch #{url}  #{key_for url}"
      @bloomfilter.insert(key_for url)
       @redis["urls:#{key_for url}"]="touched"
     end
@@ -58,7 +58,7 @@ module CloudCrawler
 
 
     def touched_url?(url)
-      @log.info "touched? #{url}  #{key_for url}"
+    #  @log.info "touched? #{url}  #{key_for url}"
       @bloomfilter.include?(key_for url)
       return !@redis["urls:#{key_for url}"].nil?
     end
