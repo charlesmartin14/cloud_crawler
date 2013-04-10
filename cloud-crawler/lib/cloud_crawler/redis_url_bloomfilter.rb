@@ -25,7 +25,7 @@ module CloudCrawler
       opts[:seed] = 1364249661
       
       # 2.5 mb? 
-      @bloomfilter = BloomFilter::Redis.new(opts)
+     @bloomfilter = BloomFilter::Redis.new(opts)
       @log = Logger.new('/tmp/bf.log')
       
     end
@@ -44,8 +44,8 @@ module CloudCrawler
     # bloom filter methods
    
     def touch_url(url)
-      @log.info "touch #{url}  #{key_for url}"
-      @bloomfilter.insert(key_for url)
+     @log.info "touch #{url}  #{key_for url}"
+     @bloomfilter.insert(key_for url)
       @redis["urls:#{key_for url}"]="touched"
     end
     alias_method :visit_url, :touch_url
