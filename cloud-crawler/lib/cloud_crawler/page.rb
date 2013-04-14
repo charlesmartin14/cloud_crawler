@@ -49,27 +49,60 @@ module CloudCrawler
       @body = params[:body]
       @error = params[:error]
 
-      @fetched = !params[:code].nil?
+      @fetched = !params[:code].nil?      
     end
 
     #
     # Array of distinct A tag HREFs from the page
     #
-    def links
-      return @links unless @links.nil?
-      @links = []
-      return @links if !doc
+    # def links
+      # return @links unless @links.nil?
+      # @links = []
+      # return @links if !doc
+# 
+      # doc.search("//a[@href]").each do |a|
+        # u = a['href']
+        # next if u.nil? or u.empty?
+        # abs = to_absolute(u) rescue next
+        # @links << abs if in_domain?(abs)
+      # end
+      # @links.uniq!
+      # @links
+    # end
+    
+    
+   # links are now full fledged dom objects
+   
+   #TODO must redo all specs
+   # TODO  monkeypatch dom element with url
+   def links
+     return @links unless @links.nil?
+     @links = []
+     return @links if !doc
 
-      doc.search("//a[@href]").each do |a|
+     doc.search("//a[@href]").each do |a|
         u = a['href']
         next if u.nil? or u.empty?
         abs = to_absolute(u) rescue next
-        @links << abs if in_domain?(abs)
+        next unless in_domain?(abs) 
+        @links << u
       end
-      @links.uniq!
       @links
-    end
+   end
+   
+   
+   def link_urls
+      @links.map{ |u| to_absolute(u) } 
+   end
+   
+   
+   
+   
 
+    #TODO:  allow acces to dom documents and to filter in DSL
+    #  add method to sync the two
+    
+    
     #
     # Nokogiri document for the HTML body
     #

@@ -3,33 +3,38 @@ require 'redis-namespace'
 require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
+require 'socket'
+
+#TODO  move S3 serialization to a seperate module
+#  so it can be tested, re-used, and optmized everywhere we use redis
 module CloudCrawler
   class RedisPageStore
     include Enumerable
 
-    DEFAULT_DUMP_RDB = "/var/lib/redis/dump-6379.rdb"
-
-    attr_reader :key_prefix, :dump_rdb
+    attr_reader :namespace, :save_to_s3, :save_to_dir, :worker_id, :s3bucket, :s3folder
 
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
       @redis = redis
-      @key_prefix = opts[:key_prefix] || 'cc'
-      @dump_rdb = opts[:dump_rdb] ||= DEFAULT_DUMP_RDB  # not used yet
-      @pages = Redis::Namespace.new(name, :redis => redis)
-      @push_to_s3 = opts[:push_to_s3] 
+      @namespace = "#{opts[:name]}:pages"
+
+      @pages = Redis::Namespace.new(@namespace, :redis => redis)
+      @save_to_s3 = if opts[:dont_save_to_s3]  then nil else opts[:save_to_s3]  end
+      @save_to_dir = if opts[:dont_files_to_dir]  then nil else opts[:save_to_dir]  end
+
+      @worker_id = opts[:worker_id] || Socket.gethostname
+      @s3bucket = @save_to_s3
+      @s3folder = opts[:name].gsub(/:/,"-")
+      @s3name = @namespace.gsub(/:/,"-")
     end
 
     def close
       @redis.quit
     end
 
-    def name
-      "#{@key_prefix}:pages"
-    end
-
+    # url encode or decode url for keys?
     def key_for(url)
-      url.to_s.gsub("https",'http')
+      url.to_s.downcase.gsub("https",'http').gsub(/\s+/,' ')
     end
 
     # We typically index the hash with a URI,
@@ -75,8 +80,6 @@ module CloudCrawler
       @pages.keys("*").size
     end
 
-  
-
     def keys
       @pages.keys("*")
     end
@@ -106,42 +109,42 @@ module CloudCrawler
     # end
 
     # simple implementation for testing locally
-    def flush!
+    def old_flush!
       keys, filename = save_keys
-      push_to_s3!(filename) if @push_to_s3
+      push_to_s3!(filename) if @save_to_s3
       delete!(keys)
     end
 
-    # gets a snapshot of the keys
-    def save_keys
-      #TODO:  add worker id to filename
-      filename = "#{@key_prefix}_pages.#{Time.now.getutc.to_s.gsub(/\s/,'').gsub(/:/,"-") }.jsons.gz"
-      Zlib::GzipWriter.open(filename) do |gz|
-        keys.each do |k| 
-          gz.write @pages[k]
-          gz.write "\n"
-          end
+    def flush
+      keys = []
+      FileUtils.mkdir_p @save_to_dir if  @save_to_dir
+      Dir.mktmpdir do |dir|
+        keys, tmpfile = save_pages_to(dir)
+        system "s3cmd put #{dir}/#{tmpfile} s3://#{s3bucket}/#{s3folder}/#{tmpfile}" if @save_to_s3
+        FileUtils.mv tmpfile @save_to_dir if @save_to_dir
       end
-
-      return keys, filename
-
+      return keys
     end
 
-    def push_to_s3!(filename)
-      #md5 = Digest::MD5.file(filename).hexdigest
+    def flush!
+      keys = flush
+      delete!(keys)
+    end
 
-      #  better to use aws-s3 library ??
+    def timestamp
+      Time.now.getutc.to_s.gsub(/\s/,'').gsub(/:/,"-")
+    end
 
-      #tmp_file = "tmp_pages"
-      filename.gsub!(/:/,"_")  # just in case it slips in
-      system "s3cmd put #{filename} s3://cloud-crawler/"
-      #system "s3cmd get #{filename} #{tmp_file}"
-
-      #tmp_md5 = Digest::MD5.file(tmp_file).hexdigest
-      # naively assume succes
-      File.delete(filename)
-
-      #return md5==tmp_md5
+    def save_pages_to(dir=".")
+      tmpfile = "#{@s3name}.#{@worker_id}.#{timestamp}.jsons.gz".gsub(/:/,"-")
+      filename = File.join(dir,tmpfile)
+      Zlib::GzipWriter.open(filename) do |gz|
+        keys.each do |k|
+          gz.write @pages[k]
+          gz.write "\n"
+        end
+      end
+      return keys, tmpfile
     end
 
     # this is so dumb...can't ruby redis cli take a giant list of keys?

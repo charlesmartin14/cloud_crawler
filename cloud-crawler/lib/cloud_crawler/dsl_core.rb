@@ -67,6 +67,9 @@ module CloudCrawler
         links = @focus_crawl_block ? instance_eval(@focus_crawl_block).call(page) : page.links
         links.select { |link| visit_link?(link, page) }.map { |link| link.dup }
       end
+      
+      #TODO:  how do we get links from the focus crawl block if we have doms
+      
 
       #
       # Returns +true+ if *link* has not been visited already,

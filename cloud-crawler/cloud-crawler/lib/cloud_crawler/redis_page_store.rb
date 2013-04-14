@@ -14,10 +14,9 @@ module CloudCrawler
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
       @redis = redis
-      @key_prefix = opts[:key_prefix] || 'cc'
-      @dump_rdb = opts[:dump_rdb] ||= DEFAULT_DUMP_RDB  # not used yet
+      @key_prefix = opts[:namespace] || 'cc'
       @pages = Redis::Namespace.new(name, :redis => redis)
-      @push_to_s3 = opts[:push_to_s3] 
+      @push_to_s3 = opts[:save_to_s3] 
     end
 
     def close

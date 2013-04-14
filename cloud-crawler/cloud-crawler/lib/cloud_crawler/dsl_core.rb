@@ -17,10 +17,7 @@ module CloudCrawler
     end
 
    # module InstanceMethods
-
-    
-
-    # end
+   # end
 
     module ClassMethods
       # Qless hook
@@ -92,7 +89,7 @@ module CloudCrawler
         @opts[:obey_robots_txt] ? @robots.allowed?(link) : true
       rescue
         false
-        end
+      end
 
       #
       # Returns +true+ if we are over the page depth limit.
@@ -121,6 +118,13 @@ module CloudCrawler
       def skip_link?(link)
         @skip_link_patterns.any? { |pattern| link.path =~ /#{pattern}/  }
       end
+      
+      # TODO
+      # add skip_link_text_patterns OR  skip_link_by_patterns
+      #  allow us to match links by the text displayed in the DOM, or even using an XPATH expressions
+      #  or even CSS selectors, using Nokogiri
+      
+      
 
     end
   end

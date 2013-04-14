@@ -11,8 +11,8 @@ module CloudCrawler
     include DslCore
   
     def self.init(job)
-      @key_prefix = @opts[:key_prefix] || 'cc'
-      @cache = Redis::Namespace.new("#{@key_prefix}:cache", :redis => job.client.redis)
+      @namespace = @opts[:name] || 'cc'
+      @cache = Redis::Namespace.new("#{@namespace}:cache", :redis => job.client.redis)
       @page_store = RedisPageStore.new(job.client.redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@opts[:qless_queue]]   

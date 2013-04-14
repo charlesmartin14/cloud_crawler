@@ -22,13 +22,13 @@ module CloudCrawler
     # TODO: test locally, then break of queue, bf, and page store
     # url_filter = @url_filter.new  # take bloom filter out of page store
     def self.init(job)
-      @key_prefix = @opts[:key_prefix] || 'cc'
-      @mcache = Redis::Namespace.new("#{@key_prefix}:mcache", :redis =>  job.client.redis)
+      @namespace = @opts[:name] || 'cc'
+      @mcache = Redis::Namespace.new("#{@namespace}:mcache", :redis =>  job.client.redis)
       
       # local host -- should be the same as job.client.redis on same machine...but maybe not?
       local_redis = Redis.new(:host=>'localhost')
-      @lcache = Redis::Namespace.new("#{@key_prefix}:lcache", :redis =>  local_redis)
-      @page_store = RedisPageStore.new(local_redis,@opts)  # #{@key_prefix}:pages"
+      @lcache = Redis::Namespace.new("#{@namespace}:lcache", :redis =>  local_redis)
+      @page_store = RedisPageStore.new(local_redis,@opts)  # #{@namespace}:pages"
       
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@opts[:qless_queue]]

@@ -6,6 +6,7 @@ require 'zlib'
 require 'logger'
 
     
+#TODO:  url = sugar
 module CloudCrawler
    
   class RedisUrlBloomfilter
@@ -29,14 +30,14 @@ module CloudCrawler
      # @log = Logger.new('/tmp/bf.log')
     end
 
-   
+    # really a bloom filter for anything with sugar
     def name
-      "#{@key_prefix}:url_bf"
+      "#{@key_prefix}:bf"
     end
 
     # same as page store
     def key_for(url)
-      url.to_s.gsub("https",'http')
+      url.to_s.downcase.gsub("https",'http').gsub(/\s+/,' ')
     end
     
     
@@ -48,12 +49,14 @@ module CloudCrawler
      @bloomfilter.insert(key_for url)
     end
     alias_method :visit_url, :touch_url
+    alias_method :insert, :touch_url
 
 
     def touch_urls(urls)
       urls.each { |u| touch_url(u) }
     end
     alias_method :visit_urls, :touch_urls 
+    alias_method :touched?, :touched_url? 
 
 
     def touched_url?(url)
@@ -62,6 +65,7 @@ module CloudCrawler
       @bloomfilter.include?(key_for url)
     end
     alias_method :visited_url?, :touched_url? 
+    alias_method :include?, :touched_url? 
 
 
   end

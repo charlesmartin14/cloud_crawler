@@ -10,7 +10,6 @@ opts = Trollop::options do
 end
 
 
-#CloudCrawler::standalone_crawl(opts[:urls], {}) do |crawl|
 CloudCrawler::crawl(opts[:urls], {}) do |crawl|
   crawl.on_every_page do |p|
     cache.incr "count"

@@ -18,7 +18,6 @@ module CloudCrawler
 
   #
   # Convenience method to start a crawl 
-  #   block not used yet
   #
   def CloudCrawler.crawl(urls, opts = {}, &block)
     Driver.crawl(urls, opts, &block)
@@ -34,7 +33,15 @@ module CloudCrawler
   # Convenience method to start a crawl in stand alone mode
   #
   def CloudCrawler.standalone_crawl(urls, opts = {}, &block)
-    crawl(urls, opts, &block)
+    Driver.crawl(urls, opts, &block)
+    Worker.run(opts)
+  end
+  
+   #
+  # Convenience method to start a batch crawl in stand alone mode
+  #
+  def CloudCrawler.standalone_batch_crawl(urls, opts = {}, &block)
+    Driver.batch_crawl(urls, opts, &block)
     Worker.run(opts)
   end
   
@@ -47,8 +54,8 @@ module CloudCrawler
      DRIVER_OPTS = {              
       :qless_host => 'localhost',
       :qless_port => 6379,
-      :qless_db => 0,  # not used yet..not sure how
-      :qless_queue => "crawl",
+      :qless_db => 0,  # not used yet...
+      :qless_queue => "crawlq", # only for testing... over-ridden with name of crawl
       :verbose => true,
       :interval => 10,
       :job_reserver => 'Ordered'
@@ -58,7 +65,9 @@ module CloudCrawler
   
     def initialize(opts = {}, &block)
       opts.reverse_merge! DRIVER_OPTS
+      opts[:qless_queue] = opts[:name]  unless opts[:name].nil? or opts[:name].empty?
       init(opts)
+      
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port] )
       @queue = @client.queues[opts[:qless_queue]]
       yield self if block_given?
@@ -74,6 +83,10 @@ module CloudCrawler
         end
       end
 
+   #
+   # Currently, we assume all crawls are simple spiders from a small set of urls
+   #  this will change 
+   #
       
    def load_urls(urls)
       urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
